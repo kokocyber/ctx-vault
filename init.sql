@@ -1,0 +1,4 @@
+CREATE DATABASE vault;
+
+CREATE USER superuser WITH PASSWORD 'superPassword';
+GRANT ALL PRIVILEGES ON DATABASE vault TO superuser;
