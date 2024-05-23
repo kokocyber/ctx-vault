@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Button, FilledInput, FormControl, Grid, IconButton, InputAdornment, InputLabel, TextField } from "@mui/material";
-import Logo from "../pic/logo.png"
+import Logo from "../../../public/pic/logo.png"
 import { useState } from "react";
 import Link from "next/link";
 import Visibility from '@mui/icons-material/Visibility';
@@ -29,11 +29,11 @@ export default function LoginPage() {
         setPassword(data);
     }
   return (
-    <Grid container className="border">
-        <Grid item xs={12}>
-            <Image src={Logo} alt="Logo of company" />
+    <Grid container className="border" justifyContent="center" alignItems="center">
+        <Grid item xs={12} className="border">
+            <Image width="auto" height="50px" src={Logo} alt="Logo of company" />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} textAlign="center">
             <TextField
             label="Email"
             value={email}
@@ -45,8 +45,8 @@ export default function LoginPage() {
             error={!email}
             />
         </Grid>
-        <Grid item xs={12}>
-        <FormControl sx={{ m: 1, width: '25ch' }} variant="filled">
+        <Grid item xs={12} textAlign="center">
+        <FormControl variant="filled">
           <InputLabel error={!password} required>Password</InputLabel>
           <FilledInput
             id="filled-adornment-password"
@@ -68,14 +68,13 @@ export default function LoginPage() {
           />
         </FormControl>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} textAlign="center">
             <Link href="/vault">
             <Button
             variant="contained"
            >Sign in</Button>
            </Link>
             </Grid>
-            
     </Grid>
   );
 }
