@@ -14,6 +14,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { FilledInput, FormControl, IconButton, InputAdornment, InputLabel } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import BackgroundImage from '@../../../public/pic/mountains.jpeg';
+import Logo from '@../../../public/pic/logo.png';
+import Image from 'next/image';
+
 
 function Copyright(props) {
   return (
@@ -71,7 +75,7 @@ export default function SignInSide() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
+            backgroundImage: {BackgroundImage},
             backgroundRepeat: 'no-repeat',
             backgroundColor: (t) =>
               t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
@@ -89,9 +93,8 @@ export default function SignInSide() {
               alignItems: 'center',
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
-            </Avatar>
+            <Image src={Logo} alt="Logo"/>
+              
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
@@ -123,6 +126,7 @@ export default function SignInSide() {
             type={showPassword ? 'text' : 'password'}
             required
             error={!password}
+            onChange={handleChangePassword}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
