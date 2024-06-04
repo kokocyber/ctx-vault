@@ -8,24 +8,27 @@ generator client {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        Int      @unique @id @default(autoincrement())
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
   role      Role     @default(User)
+  categories  Category[]
 }
 
 model Password {
-  id         Int      @id @default(autoincrement())
+  id         Int      @unique @id @default(autoincrement())
   password   String
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId Int
 }
 
 model Category {
-  id        Int        @id @default(autoincrement())
+  id        Int        @unique @id @default(autoincrement())
   name      String     @unique
   passwords Password[]
+  user      User       @relation(fields: [userId], references: [id])
+  userId    Int
 }
 
 enum Role {

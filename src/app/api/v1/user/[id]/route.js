@@ -1,0 +1,75 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+// deletes user
+async function deleteUser(userId) {
+    const data = await prisma.user.delete({
+        where: {
+            id: userId,
+        }
+    })
+    return data
+}
+
+// updates user
+async function updateUser(userId, newEmail) {
+    const data = await prisma.user.update({
+        where: userId,
+        data: {
+            email: newEmail
+        }
+    })
+    return data;
+}
+
+// retrieves user
+async function getUser(userId) {
+    const data = await prisma.user.findUniqueOrThrow({
+        where: {
+            id: userId,
+        }
+    })
+    return data
+}
+
+// DELETE request
+export async function DELETE(request, { params }) {
+    try {
+        const userId = parseInt(params.id)
+        const deletedUser = await deleteUser(userId)
+        await prisma.$disconnect()
+        return Response.json({"Deleted User": deleteUser}, {status: 200})
+    } catch(e) {
+        await prisma.$disconnect()
+        return Response.json({"Error": e}, {status: 404})
+    }
+}
+
+// PUT request
+export async function PUT(request, { params }) {
+    try {
+        const { searchParams } = new URL(request.url)
+        const userId = parseInt(params.id)
+        const newEmail = searchParams.get("email")
+        const updatedUser = await updateUser(userId, newEmail)
+        await prisma.$disconnect()
+        return Response.json({"Updated User": e}, {status: 200})
+    } catch(e) {
+        await prisma.$disconnect()
+        return Response.json({"Error": e}, {status: 404})
+    }
+}
+
+// GET request
+export async function GET(request, { params }) {
+    try {
+        const userId = parseInt(params.id)
+        const user = await getUser(userId)
+        await prisma.$disconnect()
+        return Response.json({"user": user}, {status: 200})
+    } catch(e) {
+        await prisma.$disconnect()
+        return Response.json({"Error": e}, {status: 404})
+    }
+}
