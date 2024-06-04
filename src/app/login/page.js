@@ -5,7 +5,6 @@ import { useState } from "react";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -21,6 +20,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import BackgroundImage from "../../../public/pic/mountains.jpg";
 import Logo from "../../../public/pic/logo.png";
 import Image from "next/image";
+import Link from "next/link";
 
 function Copyright(props) {
   return (
@@ -143,28 +143,32 @@ export default function SignInSide() {
                 </FormControl>
               </Grid>
               <Grid item xs={4} marginRight="2%" justifySelf="center">
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Sign In
-                </Button>
+                <Link href="/vault">
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Sign In
+                  </Button>
+                </Link>
               </Grid>
               <Grid item xs={4} justifySelf="center">
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Back
-                </Button>
+                <Link href="/">
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Back
+                  </Button>
+                </Link>
               </Grid>
 
               <Grid item xs={12} textAlign="center">
-                <Link href="#" variant="body2" textAlign="center">
+                <Link href="/sign-in" variant="body2" textAlign="center">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
