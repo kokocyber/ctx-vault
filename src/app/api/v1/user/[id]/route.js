@@ -64,8 +64,9 @@ export async function PUT(request, { params }) {
 // GET request
 export async function GET(request, { params }) {
     try {
+        var user;
         const userId = parseInt(params.id)
-        const user = await getUser(userId)
+        user = await getUser(userId)
         await prisma.$disconnect()
         return Response.json({"user": user}, {status: 200})
     } catch(e) {

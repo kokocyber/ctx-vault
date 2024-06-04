@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { NextURL } from "next/dist/server/web/next-url";
 
 const prisma = new PrismaClient();
 
