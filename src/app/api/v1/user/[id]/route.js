@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { getSession } from "@/middleware/auth";
 
 const prisma = new PrismaClient();
 
@@ -37,9 +38,19 @@ async function getUser(userId) {
 export async function DELETE(request, { params }) {
     try {
         const userId = parseInt(params.id)
-        const deletedUser = await deleteUser(userId)
-        await prisma.$disconnect()
-        return Response.json({"Deleted User": deleteUser}, {status: 200})
+        const session = await getSession()
+
+        if(session.user.id === userId || session.user.role === "Admin") {
+            const deletedUser = await deleteUser(userId)
+            await prisma.$disconnect()
+            return Response.json({"Deleted User": deleteUser}, {status: 200})
+        }
+        if(!session) {
+            return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
+        }
+        if(session.user.role !== "Admin") {
+            return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
+        }
     } catch(e) {
         await prisma.$disconnect()
         return Response.json({"Error": e}, {status: 404})
@@ -51,10 +62,20 @@ export async function PUT(request, { params }) {
     try {
         const { searchParams } = new URL(request.url)
         const userId = parseInt(params.id)
-        const newEmail = searchParams.get("email")
-        const updatedUser = await updateUser(userId, newEmail)
-        await prisma.$disconnect()
-        return Response.json({"Updated User": e}, {status: 200})
+        const session = await getSession()
+
+        if(session.user.id === userId || session.user.role === "Admin") {
+            const newEmail = searchParams.get("email")
+            const updatedUser = await updateUser(userId, newEmail)
+            await prisma.$disconnect()
+            return Response.json({"Updated User": e}, {status: 200})
+        }
+        if(!session) {
+            return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
+        }
+        if(session.user.role !== "Admin") {
+            return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
+        }
     } catch(e) {
         await prisma.$disconnect()
         return Response.json({"Error": e}, {status: 404})
@@ -64,11 +85,21 @@ export async function PUT(request, { params }) {
 // GET request
 export async function GET(request, { params }) {
     try {
-        var user;
         const userId = parseInt(params.id)
-        user = await getUser(userId)
-        await prisma.$disconnect()
-        return Response.json({"user": user}, {status: 200})
+        const session = await getSession()
+
+        if(session.user.id === userId || session.user.role === "Admin") {
+            const user = await getUser(userId)
+            await prisma.$disconnect()
+            return Response.json({"user": user}, {status: 200})
+        }
+        if(!session) {
+            return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
+        }
+        if(session.user.role !== "Admin") {
+            return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
+        }
+
     } catch(e) {
         await prisma.$disconnect()
         return Response.json({"Error": e}, {status: 404})

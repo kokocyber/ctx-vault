@@ -1,4 +1,4 @@
-import { securePassword } from "@/middleware/auth";
+import { getSession, securePassword, validateSession } from "@/middleware/auth";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -27,6 +27,14 @@ async function addUser(email, password) {
 // GET request
 export async function GET(request) {
     try {
+        const session = await getSession()
+        if(!session) {
+            return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
+        }
+        if(session.user.role !== "Admin") {
+            return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
+        }
+
         const data = await getAllUsers()
         await prisma.$disconnect()
         return Response.json({"users": data}, {status: 200})
