@@ -14,6 +14,7 @@
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
     "@prisma/client": "^5.14.0",
+    "crypto": "^1.0.1",
     "jose": "^5.4.0",
     "js-sha512": "^0.9.0",
     "migrate": "^2.1.0",

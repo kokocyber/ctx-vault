@@ -1,4 +1,4 @@
-import { encrypt, securePassword } from "@/middleware/auth"
+import { encrypt, getSession, securePassword } from "@/middleware/auth"
 import { PrismaClient } from "@prisma/client"
 import { cookies } from "next/headers"
 
@@ -22,15 +22,14 @@ export async function POST(request) {
         const user = await getUserByEmail(email)
         await prisma.$disconnect()
 
-
         const inputPassword = securePassword(password)
         if(inputPassword === user.password) {
             const expiration = new Date(Date.now() + 900 * 1000)
             const session = await encrypt({ user, expiration })
 
-            cookies().set("session", session, { expires, httpOnly: true })
+            cookies().set("session", session, { expires: expiration })
 
-            return Response.json({"data": user}, {status: 200})
+            return Response.json({"data": cookies().get("session")}, {status: 200})
 
         }
         return Response.json({"data": "wrong password"}, {status: 401})
