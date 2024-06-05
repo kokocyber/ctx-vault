@@ -13,7 +13,7 @@ Equinox benutzte folgende Technologien für die Realisierung:
 ## Installation (prod)
 // TO DO
 
-## Installation
+## Installation (dev)
 
 Installiere Dependencies
 
