@@ -1,3 +1,4 @@
+import { securePassword } from "@/middleware/auth";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -7,7 +8,7 @@ async function getAllUsers() {
     const data = await prisma.user.findMany();
     
     if(data.length === 0) {
-        data.push("No users")
+        data.push("no users")
     }
     return data;
 }
@@ -28,11 +29,11 @@ export async function GET(request) {
     try {
         const data = await getAllUsers()
         await prisma.$disconnect()
-        return Response.json({"Users": data}, {status: 200})
+        return Response.json({"users": data}, {status: 200})
             	
     } catch(e) {
         await prisma.$disconnect()
-        return Response.json({"Error": e}, {status: 400})
+        return Response.json({"error": e}, {status: 400})
     }
 }
 
@@ -42,12 +43,14 @@ export async function POST(request) {
     const email = searchParams.get("email")
     const password = searchParams.get("password")
 
+    const hashedPassword = securePassword(password)
+
     try {
-        const user = await addUser(email, password)
+        const user = await addUser(email, hashedPassword)
         await prisma.$disconnect()
-        return Response.json({"User created": user}, {status: 201})
+        return Response.json({"user created": user}, {status: 201})
     } catch(e) {
         await prisma.$disconnect()
-        return Response.json({"Error": e}, {status: 400})
+        return Response.json({"error": e}, {status: 400})
     }
 }
