@@ -24,7 +24,7 @@ export async function POST(request) {
 
         const inputPassword = securePassword(password)
         if(inputPassword === user.password) {
-            const expiration = new Date(Date.now() + 900 * 1000)
+            const expiration = new Date(Date.now() + 3600 * 1000)
             const session = await encrypt({ user, expiration })
 
             cookies().set("session", session, { expires: expiration })
