@@ -11,7 +11,7 @@ export async function encrypt(payload) {
         const session = await new SignJWT(payload)
             .setProtectedHeader({ alg: "HS256" })
             .setIssuedAt()
-            .setExpirationTime("15 minutes")
+            .setExpirationTime("1 hour")
             .sign(jwtKey)
         return session
     } catch(e) {
