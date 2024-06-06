@@ -33,10 +33,14 @@ export async function getSession() {
 }
 
 export function securePassword(password) {
-    const hashedPassword = sha512(password)
-    const hashedKey = sha512(secretKey)
+    try {
+        const hashedPassword = sha512(password)
+        const hashedKey = sha512(secretKey)
 
-    const superSecure = sha512(hashedPassword + hashedKey)
+        const superSecure = sha512(hashedPassword + hashedKey)
+        return hashedPassword + superSecure + hashedKey
+    } catch(e) {
+        return e
+    }
 
-    return hashedPassword + superSecure + hashedKey
 }
