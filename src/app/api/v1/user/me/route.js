@@ -7,7 +7,7 @@ export async function GET() {
     try {
         const session = await getSession()
         if(!session) {
-            return Response.json({"Unauthorized": "YOU ARE NOT LOGGED IN MOTHERFUCKER"})
+            return Response.json({"Unauthorized": "You are not logged in."})
         }
         return Response.json({"Authorized": session})
 
