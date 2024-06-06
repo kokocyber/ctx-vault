@@ -57,4 +57,4 @@ Unsere implementierte Endpoints
 | GET /api/v1/password | Ruft alle Passwörter für Nutzer nach Kategorie auf |
 | POST /api/v1/password | Erstellt Passwort in Kategorie für Nutzer |
 | DELETE /api/v1/password | Löscht Passwort in Kategorie für Nutzer |
-| DELETE /api/v1/password | Bearbeitet Passwort in Kategorie für Nutzer |
+| PUT /api/v1/password | Bearbeitet Passwort in Kategorie für Nutzer |
