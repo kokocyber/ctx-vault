@@ -18,8 +18,11 @@ async function createCategory(userId, categoryName) {
     const data = await prisma.category.create({
         data: {
             name: categoryName,
-            passwords: [],
-            userId: userId
+            user: {
+                connect: {
+                    id: userId
+                }
+            }
         }
     })
     return data
@@ -49,14 +52,15 @@ async function deleteCategory(categoryId) {
 
 // GET all categories for user
 export async function GET(request) {
-    const { searchParams } = new URL(request.url)
-    const userId = parseInt(searchParams.get("id"))
     try {
+        const { searchParams } = new URL(request.url)
+        const userId = parseInt(searchParams.get("id"))
+        
         const session = await getSession()
         if(!session) {
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
-        if(session.user.id !== userId) {
+        if(session.user.id !== userId && session.user.role !== "Admin") {
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
         const data = await getAllCategories(userId)
@@ -71,10 +75,11 @@ export async function GET(request) {
 
 // POST a category for user
 export async function POST(request) {
-    const { searchParams } = new URL(request.url)
-    const userId = parseInt(searchParams.get("id"))
-    const name = searchParams.get("name")
     try {
+        const { searchParams } = new URL(request.url)
+        const userId = parseInt(searchParams.get("id"))
+        const name = searchParams.get("name")
+
         const session = await getSession()
         if(!session) {
             await prisma.$disconnect()
@@ -96,11 +101,12 @@ export async function POST(request) {
 
 // PUT a category for user
 export async function PUT(request) {
-    const { searchParams } = new URL(request.url)
-    const categoryId = parseInt(searchParams.get("categoryId"))
-    const userId = parseInt(searchParams.get("id"))
-    const newName = searchParams.get("name")
     try {
+        const { searchParams } = new URL(request.url)
+        const categoryId = parseInt(searchParams.get("categoryId"))
+        const userId = parseInt(searchParams.get("id"))
+        const newName = searchParams.get("name")
+
         const session = await getSession()
         if(!session) {
             await prisma.$disconnect()
