@@ -6,9 +6,11 @@ const prisma = new PrismaClient()
 export async function GET() {
     try {
         const session = await getSession()
-        if(session) {
-            return Response.json({"Authorized": session})
+        if(!session) {
+            return Response.json({"Unauthorized": "YOU ARE NOT LOGGED IN MOTHERFUCKER"})
         }
+        return Response.json({"Authorized": session})
+
     } catch(e) {
         await prisma.$disconnect()
         return Response.json({"Unauthorized": e}, {status: 401})
