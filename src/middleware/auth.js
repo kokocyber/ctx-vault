@@ -1,5 +1,5 @@
 import { jwtVerify, SignJWT } from "jose";
-import { sha512 } from "js-sha512";
+import { sha512, sha512_256 } from "js-sha512";
 import { cookies } from "next/headers";
 
 const secretKey = process.env.SECRET_KEY
@@ -37,8 +37,8 @@ export function securePassword(password) {
         const hashedPassword = sha512(password)
         const hashedKey = sha512(secretKey)
 
-        const superSecure = sha512(hashedPassword + hashedKey)
-        return hashedPassword + superSecure + hashedKey
+        const superSecure = sha512_256(hashedPassword + hashedKey)
+        return superSecure
     } catch(e) {
         return e
     }
