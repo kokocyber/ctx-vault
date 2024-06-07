@@ -1,7 +1,10 @@
 import { getSession } from "@/middleware/auth";
+import { encryptText } from "@/middleware/encryption";
 import { PrismaClient } from "@prisma/client";
+import { sha512_256 } from "js-sha512";
 
 const prisma = new PrismaClient()
+const secretKey = process.env.SECRET_KEY
 
 // retrieve all passwords of category
 async function getPasswords(categoryId) {
@@ -85,8 +88,8 @@ export async function POST(request) {
         const categoryId = parseInt(searchParams.get("categoryId"))
         const password = searchParams.get("password")
 
-        // TODO: Encrypt password
-        const encryptedPassword = password
+        const encryptionKey = sha512_256(secretKey)
+        const encryptedPassword = encryptText(password, encryptionKey)
 
         const session = await getSession()
         if(!session) {
@@ -97,7 +100,7 @@ export async function POST(request) {
             await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
-        const createdPassword = await createPassword(password, categoryId)
+        const createdPassword = await createPassword(encryptedPassword, categoryId)
         await prisma.$disconnect()
         return Response.json({"passwords": createdPassword}, {status: 201})
 
