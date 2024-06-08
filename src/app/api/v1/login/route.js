@@ -29,7 +29,7 @@ export async function POST(request) {
 
             cookies().set("session", session, { expires: expiration })
 
-            return Response.json({"data": cookies().get("session")}, {status: 200})
+            return Response.json({"data": cookies().get("session"), "user": user}, {status: 200})
 
         }
         return Response.json({"data": "wrong password"}, {status: 401})
