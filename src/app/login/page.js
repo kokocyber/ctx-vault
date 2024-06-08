@@ -63,14 +63,43 @@ export default function SignInSide() {
     setPassword(data);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
+  async function loginUser() {
+    // Construct the URL with query parameters
+    const url = new URL("http://localhost:3000/api/v1/login");
+    url.searchParams.append("email", email);
+    url.searchParams.append("password", password);
+
+    try {
+      // Send the POST request
+      const response = await fetch(url, {
+        method: "POST",
+      });
+
+      // Handle the response
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Login successful:", data);
+        const session = data.data;
+        localStorage.setItem("session", JSON.stringify(session));
+      } else if (response.status === 401) {
+        console.log("Wrong password");
+      } else {
+        const errorData = await response.json();
+        console.error("Error:", errorData);
+      }
+    } catch (error) {
+      console.error("Network error:", error.text);
+    }
+  }
+
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   const data = new FormData(event.currentTarget);
+  //   console.log({
+  //     email: data.get("email"),
+  //     password: data.get("password"),
+  //   });
+  // };
 
   return (
     <Grid container component="main" sx={{ height: "100vh" }}>
@@ -94,12 +123,7 @@ export default function SignInSide() {
           }}
         >
           <Image width={250} height="auto" src={Logo} alt="Logo" />
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 1 }}
-          >
+          <Box component="form" onSubmit={loginUser} noValidate sx={{ mt: 1 }}>
             <Grid container rowGap={4} justifyContent="center">
               <Grid item xs={10}>
                 <TextField
@@ -143,16 +167,16 @@ export default function SignInSide() {
                 </FormControl>
               </Grid>
               <Grid item xs={4} marginRight="2%" justifySelf="center">
-                <Link href="/vault">
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                  >
-                    Sign In
-                  </Button>
-                </Link>
+                {/* <Link href="/vault"> */}
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Sign In
+                </Button>
+                {/* </Link> */}
               </Grid>
               <Grid item xs={4} justifySelf="center">
                 <Link href="/">
