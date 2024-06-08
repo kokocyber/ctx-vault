@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { getSession } from "@/middleware/auth";
+import { getSession, securePassword } from "@/middleware/auth";
 
 const prisma = new PrismaClient();
 
@@ -14,13 +14,15 @@ async function deleteUser(userId) {
 }
 
 // updates user
-async function updateUser(userId, newEmail) {
+async function updateUser(userId, newPassword, newFirstName, newLastName) {
     const data = await prisma.user.update({
         where: {
             id: userId
         },
         data: {
-            email: newEmail
+            firstName: newFirstName,
+            lastName: newLastName,
+            password: newPassword
         }
     })
     return data;
@@ -63,19 +65,33 @@ export async function PUT(request, { params }) {
     try {
         const { searchParams } = new URL(request.url)
         const userId = parseInt(params.id)
-        const session = await getSession()
-        const newEmail = searchParams.get("email")
-        const newPassword = searchParams.get("password")
 
+        var newPassword = searchParams.get("password")
+        var newFirstName = searchParams.get("firstname")
+        var newLastName = searchParams.get("lastname")
+        
+        const session = await getSession()
         if(!session) {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
         if(session.user.id !== userId && session.user.role !== "Admin") {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
         }
-        const updatedUser = await updateUser(userId, newEmail)
+
+        const currentUser = await getUser(userId)
+        if(!newPassword) {
+            newPassword = currentUser.password
+        } else {
+            newPassword = securePassword(newPassword)
+        }
+        if(!newFirstName) {
+            newFirstName = currentUser.firstName
+        }
+        if(!newLastName) {
+            newLastName = currentUser.lastName
+        }
+
+        const updatedUser = await updateUser(userId, newPassword, newFirstName, newLastName)
         await prisma.$disconnect()
         return Response.json({"Updated User": updateUser}, {status: 200})
 
@@ -92,11 +108,9 @@ export async function GET(request, { params }) {
         const session = await getSession()
 
         if(!session) {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
         if(session.user.id !== userId && session.user.role !== "Admin") {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
         }
         const user = await getUser(userId)
