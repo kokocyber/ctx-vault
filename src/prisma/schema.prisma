@@ -10,6 +10,8 @@ generator client {
 model User {
   id        Int      @unique @id @default(autoincrement())
   email     String   @unique
+  firstName String   @default("Not")
+  lastName  String   @default("Applicable")
   password  String
   createdAt DateTime @default(now())
   role      Role     @default(User)
@@ -18,6 +20,8 @@ model User {
 
 model Password {
   id         Int      @unique @id @default(autoincrement())
+  name       String
+  username   String
   password   String
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId Int

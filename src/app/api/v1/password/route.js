@@ -1,4 +1,4 @@
-import { getSession } from "@/middleware/auth";
+import { encrypt, getSession } from "@/middleware/auth";
 import { encryptText } from "@/middleware/encryption";
 import { PrismaClient } from "@prisma/client";
 import { sha512_256 } from "js-sha512";
@@ -17,9 +17,11 @@ async function getPasswords(categoryId) {
 }
 
 // create password for category
-async function createPassword(password, categoryId) {
+async function createPassword(name, username, password, categoryId) {
     const data = prisma.password.create({
         data: {
+            name: name,
+            username: username,
             password: password,
             category: {
                 connect: {
@@ -86,21 +88,23 @@ export async function POST(request) {
         const { searchParams } = new URL(request.url)
         const userId = parseInt(searchParams.get("id"))
         const categoryId = parseInt(searchParams.get("categoryId"))
+
+        const name = searchParams.get("name")
+        const username = searchParams.get("username")
         const password = searchParams.get("password")
 
         const encryptionKey = sha512_256(secretKey)
         const encryptedPassword = encryptText(password, encryptionKey)
+        const encryptedUsername = encryptText(username, encryptionKey)
 
         const session = await getSession()
         if(!session) {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
         if(session.user.id !== userId && session.user.role !== "Admin") {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
-        const createdPassword = await createPassword(encryptedPassword, categoryId)
+        const createdPassword = await createPassword(name, encryptedUsername, encryptedPassword, categoryId)
         await prisma.$disconnect()
         return Response.json({"passwords": createdPassword}, {status: 201})
 
@@ -143,8 +147,12 @@ export async function DELETE(request) {
 export async function PUT(request) {
     try {
         const { searchParams } = new URL(request.url)
+
         const userId = parseInt(searchParams.get("id"))
         const passwordId = parseInt(searchParams.get("passwordId"))
+
+        const newName = searchParams.get("name")
+        const newUsername = searchParams.get("username")
         const newPassword = searchParams.get("password")
 
         const session = await getSession()
@@ -156,7 +164,10 @@ export async function PUT(request) {
             await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
-        const updatedPassword = updatePassword(newPassword, passwordId)
+        const encryptedNewUsername = encryptText(newUsername)
+        const encryptedNewPassword = encryptText(newPassword)
+
+        const updatedPassword = updatePassword(newName, passwordId)
         await prisma.$disconnect()
         return Response.json({"deleted user": updatePassword}, {status: 200})
 
