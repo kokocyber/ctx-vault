@@ -20,9 +20,9 @@ model User {
 
 model Password {
   id         Int      @unique @id @default(autoincrement())
-  name       String
-  username   String
-  password   String
+  name       String   @default("")
+  username   String   @default("")
+  password   String   @default("")
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId Int
 }
