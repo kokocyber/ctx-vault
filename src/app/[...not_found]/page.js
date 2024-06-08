@@ -7,13 +7,15 @@ import Link from "next/link";
 export default function custom404() {
   return (
     <Grid container justifyContent="center" alignContent="center">
-      <Grid item xs={7} textAlign="center" paddingTop="10%">
+      <Grid item xs={8} textAlign="center" paddingTop="10%">
         <h1 className="title">Bro, what are you searching for?</h1>
       </Grid>
       <Grid item xs={12} />
       <Grid item xs={3} textAlign="center">
         <Link href="/">
-          <Button variant="contained">Return</Button>
+          <Button variant="contained" color="secondary">
+            Home
+          </Button>
         </Link>
       </Grid>
     </Grid>
