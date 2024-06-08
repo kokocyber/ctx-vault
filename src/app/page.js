@@ -35,7 +35,9 @@ export default function Home() {
           </Grid>
           <Grid item xs textAlign="right">
             <Link href="/login">
-              <Button variant="outlined">Sign in</Button>
+              <Button variant="contained" color="secondary">
+                Sign in
+              </Button>
             </Link>
           </Grid>
         </Grid>
@@ -49,7 +51,9 @@ export default function Home() {
         <Grid item xs={12} />
         <Grid item xs={7}>
           <Link href="/login">
-            <Button variant="outlined">Sign in</Button>
+            <Button variant="contained" color="secondary">
+              Sign in
+            </Button>
           </Link>
         </Grid>
       </Grid>
