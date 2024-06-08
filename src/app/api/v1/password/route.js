@@ -1,10 +1,20 @@
-import { encrypt, getSession } from "@/middleware/auth";
-import { encryptText } from "@/middleware/encryption";
+import { decrypt, encrypt, getSession } from "@/middleware/auth";
+import { decryptText, encryptText } from "@/middleware/encryption";
 import { PrismaClient } from "@prisma/client";
 import { sha512_256 } from "js-sha512";
 
 const prisma = new PrismaClient()
 const secretKey = process.env.SECRET_KEY
+
+// retrieve password by id
+async function getPassword(passwordId) {
+    const data = prisma.password.findFirst({
+        where: {
+            id: passwordId
+        }
+    })
+    return data
+}
 
 // retrieve all passwords of category
 async function getPasswords(categoryId) {
@@ -44,15 +54,18 @@ async function deletePassword(passwordId) {
 }
 
 // edit password of category
-async function updatePassword(newPassword, passwordId) {
+async function updatePassword(newPassword, newUsername, newName, passwordId) {
     const data = prisma.password.update({
         where: {
            id:  passwordId 
         },
         data: {
+            name: newName,
+            username: newUsername,
             password: newPassword
         }
     })
+    return data
 }
 
 // GET category passwords of user
@@ -106,7 +119,7 @@ export async function POST(request) {
         }
         const createdPassword = await createPassword(name, encryptedUsername, encryptedPassword, categoryId)
         await prisma.$disconnect()
-        return Response.json({"passwords": createdPassword}, {status: 201})
+        return Response.json({"Created Password": createdPassword}, {status: 201})
 
     } catch(e) {
         prisma.$disconnect()
@@ -151,9 +164,9 @@ export async function PUT(request) {
         const userId = parseInt(searchParams.get("id"))
         const passwordId = parseInt(searchParams.get("passwordId"))
 
-        const newName = searchParams.get("name")
-        const newUsername = searchParams.get("username")
-        const newPassword = searchParams.get("password")
+        var newName = searchParams.get("name")
+        var newUsername = searchParams.get("username")
+        var newPassword = searchParams.get("password")
 
         const session = await getSession()
         if(!session) {
@@ -164,10 +177,22 @@ export async function PUT(request) {
             await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
-        const encryptedNewUsername = encryptText(newUsername)
-        const encryptedNewPassword = encryptText(newPassword)
 
-        const updatedPassword = updatePassword(newName, passwordId)
+        const encryptionKey = sha512_256(secretKey)
+        const currentPassword = await getPassword(passwordId)
+        if(!newName) {
+            newName = currentPassword.name
+        }
+        if(!newUsername) {
+            newUsername = decryptText(currentPassword.username, encryptionKey)
+        }
+        if(!newPassword) {
+            newPassword = decryptText(currentPassword.password, encryptionKey)
+        }
+        const encryptedPassword = encryptText(newPassword, encryptionKey)
+        const encryptedUsername = encryptText(newUsername, encryptionKey)
+
+        const updatedPassword = updatePassword(encryptedPassword, encryptedUsername, newName, passwordId)
         await prisma.$disconnect()
         return Response.json({"deleted user": updatePassword}, {status: 200})
 
