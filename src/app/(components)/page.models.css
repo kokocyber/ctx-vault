@@ -1,0 +1,18 @@
+.title {
+    font-weight: bold;
+    font-size: xx-large;
+    display: flex;
+    justify-content: center;
+}
+
+.time {
+    font-size: medium;
+}
+
+.price {
+    font-size: x-large;
+}
+
+.small {
+    font-size: smaller;
+}
