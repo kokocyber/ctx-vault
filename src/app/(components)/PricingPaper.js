@@ -29,10 +29,10 @@ export default function PricingPaper(props) {
         >
             <div className="title">{title}</div>
             <Divider />
-            <p>
+            <p className='description'>
                 With our {title} subscription you can:
             </p>
-            <p>
+            <p className='description'>
                 {description}
             </p>
             <Divider />
