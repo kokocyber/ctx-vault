@@ -60,9 +60,9 @@ export async function POST(request) {
     try {
         const user = await addUser(email, hashedPassword, firstName, lastName)
         await prisma.$disconnect()
-        return Response.json({"user created": user}, {status: 201})
+        return Response.json({"user created": user, "status": 201}, {status: 201})
     } catch(e) {
         await prisma.$disconnect()
-        return Response.json({"error": e}, {status: 400})
+        return Response.json({"error": e, "status": 400}, {status: 400})
     }
 }

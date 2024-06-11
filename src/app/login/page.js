@@ -21,6 +21,11 @@ import BackgroundImage from "../../../public/pic/mountains.jpg";
 import Logo from "../../../public/pic/logo.png";
 import Image from "next/image";
 import Link from "next/link";
+import { login } from "../(util)/api";
+import { useRouter } from "next/navigation";
+
+import { UserContext } from "../(context)/UserContextComponent";
+import { useContext } from "react";
 
 function Copyright(props) {
   return (
@@ -41,9 +46,14 @@ function Copyright(props) {
 }
 
 export default function SignIn() {
+  const router = useRouter()
+
+  const { isUserLoggedIn, setIsUserLoggedIn, userData } = useContext(UserContext)
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -61,34 +71,28 @@ export default function SignIn() {
     setPassword(data);
   };
 
-  async function loginUser() {
-    // Construct the URL with query parameters
-    const url = new URL("http://localhost:3000/api/v1/login");
-    url.searchParams.append("email", email);
-    url.searchParams.append("password", password);
-
+  const handleLogin = async (event) => {
+    event.preventDefault()
     try {
-      // Send the POST request
-      const response = await fetch(url, {
-        method: "POST",
-      });
+      const response = await login(email, password)
 
-      // Handle the response
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Login successful:", data);
-        const session = data.data;
-        localStorage.setItem("session", JSON.stringify(session));
-      } else if (response.status === 401) {
-        console.log("Wrong password");
-      } else {
-        const errorData = await response.json();
-        console.error("Error:", errorData);
+      if(response.data.session) {
+        userData.current = ""
+        setIsUserLoggedIn(true)
+        router.push("/vault")
       }
-    } catch (error) {
-      console.error("Network error:", error.text);
+
+      if(response.status === 404) {
+        alert("User not found")
+      } else if(response.status === 401) {
+        alert("Wrong password")
+      }
+
+    } catch(e) {
+      console.error("Login failed:", e)
     }
   }
+
   return (
     <Grid container component="main" sx={{ height: "100vh" }}>
       <CssBaseline />
@@ -111,7 +115,7 @@ export default function SignIn() {
           }}
         >
           <Image width={250} height="auto" src={Logo} alt="Logo" />
-          <Box component="form" onSubmit={loginUser} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>
             <Grid container rowGap={4} justifyContent="center">
               <Grid item xs={10}>
                 <TextField
@@ -155,7 +159,6 @@ export default function SignIn() {
                 </FormControl>
               </Grid>
               <Grid item xs={4} marginRight="2%" justifySelf="center">
-                {/* <Link href="/vault"> */}
                 <Button
                   type="submit"
                   fullWidth
@@ -164,7 +167,6 @@ export default function SignIn() {
                 >
                   Sign In
                 </Button>
-                {/* </Link> */}
               </Grid>
               <Grid item xs={4} justifySelf="center">
                 <Link href="/">
@@ -180,7 +182,7 @@ export default function SignIn() {
               </Grid>
 
               <Grid item xs={12} textAlign="center">
-                <Link href="/sign-in" variant="body2" textAlign="center">
+                <Link href="/register" variant="body2" textAlign="center">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

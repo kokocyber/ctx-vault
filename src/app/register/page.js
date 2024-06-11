@@ -21,6 +21,9 @@ import BackgroundImage from "../../../public/pic/mountains.jpg";
 import Logo from "../../../public/pic/logo.png";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import { register } from "../(util)/api";
 
 function Copyright(props) {
   return (
@@ -41,6 +44,8 @@ function Copyright(props) {
 }
 
 export default function SignUp() {
+  const router = useRouter()
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -73,32 +78,22 @@ export default function SignUp() {
     setPassword(data);
   };
 
-  async function loginUser() {
-    // Construct the URL with query parameters
-    const url = new URL("http://localhost:3000/api/v1/login");
-    url.searchParams.append("email", email);
-    url.searchParams.append("password", password);
-
+  const handleRegister = async (event) => {
+    event.preventDefault()
     try {
-      // Send the POST request
-      const response = await fetch(url, {
-        method: "POST",
-      });
+      const response = await register(email, password, name, lastName)
 
-      // Handle the response
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Login successful:", data);
-        const session = data.data;
-        localStorage.setItem("session", JSON.stringify(session));
-      } else if (response.status === 401) {
-        console.log("Wrong password");
-      } else {
-        const errorData = await response.json();
-        console.error("Error:", errorData);
+      if(response.status === 201) {
+        alert("User Created, please log in")
+        router.push("/login")
       }
-    } catch (error) {
-      console.error("Network error:", error.text);
+
+      if(response.status === 400) {
+        alert("User exists")
+      }
+
+    } catch(e) {
+      console.error("Login failed:", e)
     }
   }
 
@@ -124,7 +119,7 @@ export default function SignUp() {
           }}
         >
           <Image width={250} height="auto" src={Logo} alt="Logo" />
-          <Box component="form" onSubmit={loginUser} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleRegister} noValidate sx={{ mt: 1 }}>
             <Grid container rowGap={4} justifyContent="center">
               <Grid item container xs={10} spacing={4}>
                 <Grid item xs>
@@ -219,7 +214,7 @@ export default function SignUp() {
               </Grid>
 
               <Grid item xs={12} textAlign="center">
-                <Link href="/sign-in" variant="body2" textAlign="center">
+                <Link href="/login" variant="body2" textAlign="center">
                   {"Already have an account? Sign-in"}
                 </Link>
               </Grid>

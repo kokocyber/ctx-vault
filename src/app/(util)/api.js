@@ -102,3 +102,114 @@ export async function deleteCategory(categoryId, userId) {
     throw error;
   }
 }
+
+
+// login API calls
+export async function login(email, password) {
+  try {
+    const response = await fetch(
+      `/api/v1/login?email=${email}&password=${password}`,
+      {
+        method: "POST",
+      }
+    );
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !response.ok ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      const errorText = await response.text();
+      console.error("Error logging in:", errorText);
+      return response
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+// verify if logged in
+export async function verifyCookie() {
+  try {
+    const response = await fetch(
+      `/api/v1/user/me`,
+      {
+        method: "GET",
+      }
+    );
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !response.ok ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return response
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+// registers user
+export async function register(email, password, firstName, lastName) {
+  try {
+    const response = await fetch(
+      `/api/v1/user?email=${email}&password=${password}&firstName=${firstName}&lastName=${lastName}`,
+      {
+        method: "POST",
+      }
+    );
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !response.ok ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return response
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+// logout user
+export async function logout() {
+  try {
+    const response = await fetch(
+      `/api/v1/logout`,
+      {
+        method: "GET",
+      }
+    );
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !response.ok ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return response
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
