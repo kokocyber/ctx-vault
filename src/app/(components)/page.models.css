@@ -20,3 +20,11 @@
 .small {
     font-size: smaller;
 }
+
+.paperStyle {
+   opacity: 65%;
+    padding: 5%;
+    transition: 0.3s;
+    border-radius: 27px 27px 27px 27px;
+      
+}

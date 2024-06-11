@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Button, Grid } from "@mui/material";
+import { Avatar, Grid } from "@mui/material";
 import Link from "next/link";
 import Logo from "../../../public/pic/logo.png";
 import Image from "next/image";
@@ -11,10 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
-import PersonAdd from "@mui/icons-material/PersonAdd";
-import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import HttpsIcon from "@mui/icons-material/Https";
 
@@ -109,7 +106,11 @@ export function Navbar(props) {
                   aria-haspopup="true"
                   aria-expanded={open ? "true" : undefined}
                 >
-                  <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                  <Avatar
+                    className="accAvatar"
+                    sx={{ width: 50, height: 50 }}
+                    {...stringAvatar("taha ali")}
+                  />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -148,23 +149,37 @@ export function Navbar(props) {
               transformOrigin={{ horizontal: "right", vertical: "top" }}
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-              <MenuItem onClick={handleClose}>
-                <Avatar /> My account
-              </MenuItem>
-              <Divider />
+              <Link href="/account" className="smallLinks">
+                <MenuItem onClick={handleClose}>
+                  <Grid container alignItems="center">
+                    <Grid item xs>
+                      <Avatar />
+                    </Grid>
+                    <Grid item xs>
+                      My account
+                    </Grid>
+                  </Grid>
+                </MenuItem>
+              </Link>
 
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <HttpsIcon fontSize="small" />
-                </ListItemIcon>
-                Vault
-              </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <Logout fontSize="small" />
-                </ListItemIcon>
-                Logout
-              </MenuItem>
+              <Divider />
+              <Link href="/vault" className="smallLinks">
+                <MenuItem onClick={handleClose}>
+                  {" "}
+                  <ListItemIcon>
+                    <HttpsIcon />
+                  </ListItemIcon>
+                  Vault
+                </MenuItem>
+              </Link>
+              <Link href="/sign-out" className="smallLinks">
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <Logout />
+                  </ListItemIcon>
+                  Logout
+                </MenuItem>
+              </Link>
             </Menu>{" "}
           </Grid>
         </Grid>

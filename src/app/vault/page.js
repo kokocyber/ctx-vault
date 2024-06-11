@@ -1,7 +1,18 @@
 "use client";
 
 import { useState } from "react";
+
+import { styled } from "@mui/system";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
   Container,
   List,
   ListItem,
@@ -16,18 +27,6 @@ import {
   DialogTitle,
   TextField,
   IconButton,
-} from "@mui/material";
-import { styled } from "@mui/system";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
 } from "@mui/material";
 
 const initialCategoriesData = {
@@ -61,12 +60,12 @@ const FullHeightContainer = styled(Container)({
 });
 
 const FullHeightPaper = styled(Paper)({
-  height: "100%",
+  height: "60%",
   marginRight: "8px",
 });
 
 const CategoryList = styled(List)({
-  height: "100%",
+  height: "60%",
   width: "100%",
   overflow: "auto",
 });
@@ -83,7 +82,7 @@ const ActionButtons = styled(Box)({
 });
 
 const TableBox = styled(Box)({
-  height: "100%",
+  height: "60%",
   width: "100%",
   display: "flex",
   flexDirection: "column",
