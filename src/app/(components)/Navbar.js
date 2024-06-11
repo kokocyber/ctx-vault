@@ -14,6 +14,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import HttpsIcon from "@mui/icons-material/Https";
+import { logout } from "../(util)/api";
 
 export function Navbar(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -21,10 +22,10 @@ export function Navbar(props) {
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   const { children } = props;
 
   function stringToColor(string) {
@@ -172,7 +173,7 @@ export function Navbar(props) {
                   Vault
                 </MenuItem>
               </Link>
-              <Link href="/sign-out" className="smallLinks">
+              <Link href="/logout" className="smallLinks">
                 <MenuItem onClick={handleClose}>
                   <ListItemIcon>
                     <Logout />

@@ -6,6 +6,8 @@ export async function GET() {
         const session = await getSession()
         if(!session) return Response.json({"Error": "how do you wanna log out if you are not even logged in?"}, {status: 404});
         cookies().set("session", "", { expires: new Date(0) })
+        
+        return Response.json({"status": 200})
     } catch(e) {
         return Response.json({"Error": e}, {status: 404})
     }

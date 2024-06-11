@@ -17,16 +17,14 @@ async function getUserData(userId) {
     return data
 }
 
-
 export async function GET() {
     try {
         const session = await getSession()
         if(!session) {
-            return Response.json({"Unauthorized": "You are not logged in."})
+            return Response.json({"Unauthorized": "You are not logged in."}, { status: 403 })
         }
         const userData = await getUserData(session.user.id)
-        console.log(userData)
-        return Response.json({"User Data": userData})
+        return Response.json({"id": session, "user data": userData})
 
     } catch(e) {
         await prisma.$disconnect()
