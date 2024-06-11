@@ -25,14 +25,21 @@ export async function POST(request) {
         const inputPassword = securePassword(password)
         if(inputPassword === user.password) {
             const expiration = new Date(Date.now() + 3600 * 1000)
-            const session = await encrypt({ user, expiration })
 
+            const oldSession = await getSession()
+            if(oldSession) {
+                cookies().set("session", "", { expires: new Date(0) })
+            }
+
+            const session = await encrypt({ user, expiration })
             cookies().set("session", session, { expires: expiration })
 
             return Response.json({"data": {"session": cookies().get("session"), "user": user}}, {status: 200})
 
+
+        } else {
+            return Response.json({"data": "wrong password"}, {status: 401})
         }
-        return Response.json({"data": "wrong password"}, {status: 401})
 
     } catch(e) {
         await prisma.$disconnect()
