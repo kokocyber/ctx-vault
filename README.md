@@ -49,6 +49,8 @@ Unsere implementierte Endpoints
 | DELETE /api/v1/user/[id] | Löscht Nutzer nach ID |
 | PUT /api/v1/user/[id] | Bearbeitet Nutzer nach ID |
 |  |  |
+| GET /api/v1/user/me | Ruft Benutzer-Daten auf |
+|  |  |
 | GET /api/v1/categories | Ruft alle Passwort-Kategorien für Nutzer auf |
 | POST /api/v1/categories | Erstellt Passwort-Kategorie für Nutzer |
 | PUT /api/v1/categories | Bearbeitet Passwort-Kategorie Namen für Nutzer |
@@ -58,3 +60,7 @@ Unsere implementierte Endpoints
 | POST /api/v1/password | Erstellt Passwort in Kategorie für Nutzer |
 | DELETE /api/v1/password | Löscht Passwort in Kategorie für Nutzer |
 | PUT /api/v1/password | Bearbeitet Passwort in Kategorie für Nutzer |
+
+
+## Datenabspeicherung
+
