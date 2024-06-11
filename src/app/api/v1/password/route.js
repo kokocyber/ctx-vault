@@ -170,11 +170,9 @@ export async function PUT(request) {
 
         const session = await getSession()
         if(!session) {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
         if(session.user.id !== userId && session.user.role !== "Admin") {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
 

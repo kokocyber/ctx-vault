@@ -38,6 +38,7 @@ async function updateCategory(categoryId, newCategoryName) {
             name: newCategoryName
         }
     })
+    return data
 }
 
 // deletes category for user
@@ -63,6 +64,7 @@ export async function GET(request) {
         if(session.user.id !== userId && session.user.role !== "Admin") {
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
+
         const data = await getAllCategories(userId)
         await prisma.$disconnect()
         return Response.json({"categories": data}, {status: 200})
@@ -82,13 +84,12 @@ export async function POST(request) {
 
         const session = await getSession()
         if(!session) {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
         if(session.user.id !== userId && session.user.role !== "Admin") {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
+
         const createdCategory = await createCategory(userId, name)
         await prisma.$disconnect()
         return Response.json({"Created category": createdCategory}, {status: 201})
@@ -109,13 +110,12 @@ export async function PUT(request) {
 
         const session = await getSession()
         if(!session) {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
         if(session.user.id !== userId && session.user.role !== "Admin") {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
+
         const updatedCategory = await updateCategory(categoryId, newName)
         await prisma.$disconnect()
         return Response.json({"Updated": updateCategory}, {status: 200})
@@ -134,13 +134,12 @@ export async function DELETE(request) {
     try {
         const session = await getSession()
         if(!session) {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
         if(session.user.id !== userId && session.user.role !== "Admin") {
-            await prisma.$disconnect()
             return Response.json({"Unauthorized": "Not enough permission!"}, {status: 403})
         }
+
         const deletedCategory = await deleteCategory(categoryId)
         await prisma.$disconnect()
         return Response.json({"Deleted": deleteCategory}, {status: 200})
