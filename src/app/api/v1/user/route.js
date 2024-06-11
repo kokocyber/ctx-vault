@@ -14,11 +14,13 @@ async function getAllUsers() {
 }
 
 // adds user
-async function addUser(email, password) {
+async function addUser(email, password, firstName, lastName) {
     const user = await prisma.user.create({
         data: {
             email: email,
-            password: password
+            firstName: firstName,
+            lastName: lastName,
+            password: password,
         }
     })
     return user;
@@ -50,11 +52,13 @@ export async function POST(request) {
     const { searchParams } = new URL(request.url)
     const email = searchParams.get("email")
     const password = searchParams.get("password")
+    const firstName = searchParams.get("firstName")
+    const lastName = searchParams.get("lastName")
 
     const hashedPassword = securePassword(password)
 
     try {
-        const user = await addUser(email, hashedPassword)
+        const user = await addUser(email, hashedPassword, firstName, lastName)
         await prisma.$disconnect()
         return Response.json({"user created": user}, {status: 201})
     } catch(e) {
