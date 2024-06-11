@@ -1,11 +1,8 @@
 "use client";
 
-import { useState } from "react";
-
-import { styled } from "@mui/system";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useState, useEffect } from "react";
 import {
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -28,29 +25,14 @@ import {
   TextField,
   IconButton,
 } from "@mui/material";
-
-const initialCategoriesData = {
-  Email: [
-    { name: "Gmail", username: "user@gmail.com", password: "password123" },
-    { name: "Yahoo", username: "user@yahoo.com", password: "password123" },
-  ],
-  "Social Media": [
-    {
-      name: "Facebook",
-      username: "user@facebook.com",
-      password: "password123",
-    },
-    { name: "Twitter", username: "user@twitter.com", password: "password123" },
-  ],
-  Banking: [
-    {
-      name: "Bank of America",
-      username: "user@boa.com",
-      password: "password123",
-    },
-    { name: "Chase", username: "user@chase.com", password: "password123" },
-  ],
-};
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  fetchCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from "../(util)/api";
 
 const FullHeightContainer = styled(Container)({
   height: "100vh",
@@ -102,10 +84,8 @@ const TableRowHover = styled(TableRow)({
 });
 
 export default function Home() {
-  const [categoriesData, setCategoriesData] = useState(initialCategoriesData);
-  const [selectedCategory, setSelectedCategory] = useState(
-    Object.keys(categoriesData)[0]
-  );
+  const [categoriesData, setCategoriesData] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [openAddCategory, setOpenAddCategory] = useState(false);
   const [openAddPassword, setOpenAddPassword] = useState(false);
   const [openEditCategory, setOpenEditCategory] = useState(false);
@@ -116,6 +96,29 @@ export default function Home() {
     password: "",
   });
   const [editingCategory, setEditingCategory] = useState(null);
+
+  const userId = 1; // Replace with actual userId from your authentication
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const categories = await fetchCategories(userId);
+        console.log("fetched categories", categories);
+        const categoriesObj = categories.reduce((acc, category) => {
+          acc[category.name] = [];
+          return acc;
+        }, {});
+        setCategoriesData(categoriesObj);
+        if (categories.length > 0) {
+          setSelectedCategory(categories[0].name);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadCategories();
+  }, [userId]);
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
@@ -148,10 +151,15 @@ export default function Home() {
     setEditingCategory(null);
   };
 
-  const handleAddCategory = () => {
-    setCategoriesData({ ...categoriesData, [newCategory]: [] });
-    setNewCategory("");
-    handleAddCategoryClose();
+  const handleAddCategory = async () => {
+    try {
+      const createdCategory = await createCategory(userId, newCategory);
+      setCategoriesData({ ...categoriesData, [createdCategory.name]: [] });
+      setNewCategory("");
+      handleAddCategoryClose();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleAddPassword = () => {
@@ -184,23 +192,38 @@ export default function Home() {
     });
   };
 
-  const handleUpdateCategory = () => {
-    const updatedCategories = { ...categoriesData };
-    if (editingCategory !== newCategory && newCategory) {
-      updatedCategories[newCategory] = updatedCategories[editingCategory];
-      delete updatedCategories[editingCategory];
-      setSelectedCategory(newCategory);
+  const handleUpdateCategory = async () => {
+    try {
+      const updatedCategory = await updateCategory(
+        editingCategory.id,
+        userId,
+        newCategory
+      );
+      const updatedCategories = { ...categoriesData };
+      if (editingCategory.name !== newCategory && newCategory) {
+        updatedCategories[newCategory] =
+          updatedCategories[editingCategory.name];
+        delete updatedCategories[editingCategory.name];
+        setSelectedCategory(newCategory);
+      }
+      setCategoriesData(updatedCategories);
+      handleEditCategoryClose();
+    } catch (error) {
+      console.error(error);
     }
-    setCategoriesData(updatedCategories);
-    handleEditCategoryClose();
   };
 
-  const handleDeleteCategory = (category) => {
-    const updatedCategories = { ...categoriesData };
-    delete updatedCategories[category];
-    setCategoriesData(updatedCategories);
-    if (category === selectedCategory) {
-      setSelectedCategory(Object.keys(updatedCategories)[0] || "");
+  const handleDeleteCategory = async (category) => {
+    try {
+      await deleteCategory(category.id, userId);
+      const updatedCategories = { ...categoriesData };
+      delete updatedCategories[category.name];
+      setCategoriesData(updatedCategories);
+      if (category.name === selectedCategory) {
+        setSelectedCategory(Object.keys(updatedCategories)[0] || "");
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -263,7 +286,7 @@ export default function Home() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {categoriesData[selectedCategory].map((row, index) => (
+                {categoriesData[selectedCategory]?.map((row, index) => (
                   <TableRowHover key={index}>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.username}</TableCell>
