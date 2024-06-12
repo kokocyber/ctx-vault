@@ -14,7 +14,7 @@ async function verifySession() {
 
 export default function UserContextComponent({ children }) {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  const userData = useRef(0)
+  const userData = useRef("")
 
   useEffect(() => {
     if(document.cookie) {
