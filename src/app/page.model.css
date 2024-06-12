@@ -47,4 +47,10 @@ body{
 
 .highlight {
     color: #9c27b0;
+    transition-duration: 1s;
+}
+
+.highlight:hover {
+  font-size: 120%;
+  transition-duration: 1s;
 }

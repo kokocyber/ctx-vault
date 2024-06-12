@@ -103,7 +103,6 @@ export async function deleteCategory(categoryId, userId) {
   }
 }
 
-
 // login API calls
 export async function login(email, password) {
   try {
@@ -122,7 +121,7 @@ export async function login(email, password) {
     ) {
       const errorText = await response.text();
       console.error("Error logging in:", errorText);
-      return response
+      return response;
     }
 
     const data = await response.json();
@@ -136,12 +135,9 @@ export async function login(email, password) {
 // verify if logged in
 export async function verifyCookie() {
   try {
-    const response = await fetch(
-      `/api/v1/user/me`,
-      {
-        method: "GET",
-      }
-    );
+    const response = await fetch(`/api/v1/user/me`, {
+      method: "GET",
+    });
     const contentType = response.headers.get("content-type");
 
     if (
@@ -149,7 +145,7 @@ export async function verifyCookie() {
       !contentType ||
       !contentType.includes("application/json")
     ) {
-      return response
+      return response;
     }
 
     const data = await response.json();
@@ -176,7 +172,7 @@ export async function register(email, password, firstName, lastName) {
       !contentType ||
       !contentType.includes("application/json")
     ) {
-      return response
+      return response;
     }
 
     const data = await response.json();
@@ -190,12 +186,9 @@ export async function register(email, password, firstName, lastName) {
 // logout user
 export async function logout() {
   try {
-    const response = await fetch(
-      `/api/v1/logout`,
-      {
-        method: "GET",
-      }
-    );
+    const response = await fetch(`/api/v1/logout`, {
+      method: "GET",
+    });
     const contentType = response.headers.get("content-type");
 
     if (
@@ -203,7 +196,7 @@ export async function logout() {
       !contentType ||
       !contentType.includes("application/json")
     ) {
-      return response
+      return response;
     }
 
     const data = await response.json();

@@ -88,8 +88,8 @@ const TableRowHover = styled(TableRow)({
 });
 
 export default function Home() {
-  const { isUserLoggedIn, userData } = useContext(UserContext)
-  const router = useRouter()
+  const { isUserLoggedIn, userData } = useContext(UserContext);
+  const router = useRouter();
 
   const [categoriesData, setCategoriesData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -106,11 +106,11 @@ export default function Home() {
 
   const userId = 1; // Replace with actual userId from your authentication
 
-  useEffect(() => {
-    if(!isUserLoggedIn || userData.current === "") {
-      router.push("/")
-    } 
-  }, [])
+  // useEffect(() => {
+  //   if (!isUserLoggedIn || userData.current === "") {
+  //     router.push("/");
+  //   }
+  // }, []);
 
   useEffect(() => {
     async function loadCategories() {
