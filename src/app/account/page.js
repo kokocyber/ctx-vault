@@ -2,6 +2,7 @@
 
 import {
   Avatar,
+  Button,
   FilledInput,
   FormControl,
   Grid,
@@ -57,7 +58,7 @@ export default function Account() {
           <h1 className="accountTitle">
             Hey,
             {/* <span className="highlightOrange">{userData.firstName}</span> */}
-            <span className="highlightOrange">Taha</span>
+            <span className="highlightOrange"> {userData.current.id.user.firstName} :)</span>
           </h1>
         </Grid>
         <Grid item xs={4}>
@@ -105,6 +106,13 @@ export default function Account() {
           </FormControl>
         </Grid>
       </Grid>
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        padding: 3
+      }}>
+        <Button>Update</Button>
+      </div>
     </>
   );
 }
