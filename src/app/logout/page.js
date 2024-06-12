@@ -5,6 +5,7 @@ import { logout } from "../(util)/api";
 
 import { UserContext } from "../(context)/UserContextComponent";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 async function logoutUser() {
     const response = await logout()
@@ -20,11 +21,13 @@ export default function Logout() {
         if(isUserLoggedIn) {
             logoutUser()
                 .then((response) => {
+                    toast.success("Successfully logged out")
                     setIsUserLoggedIn(false)
                     userData.current = ""
                     router.push("/")
                 })
         } else {
+            toast.error("You are not logged in")
             router.push("/")
         }
         
