@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 
 import { UserContext } from "../(context)/UserContextComponent";
 import { useContext } from "react";
+import { verifyCookie } from "../(util)/api";
 
 function Copyright(props) {
   return (
@@ -45,7 +46,15 @@ function Copyright(props) {
   );
 }
 
+async function retrieveUserData() {
+  const response = await verifyCookie()
+  if(response.id) {
+    return response
+  }
+}
+
 export default function SignIn() {
+ 
   const router = useRouter()
 
   const { isUserLoggedIn, setIsUserLoggedIn, userData } = useContext(UserContext)
@@ -77,8 +86,10 @@ export default function SignIn() {
       const response = await login(email, password)
 
       if(response.data.session) {
-        userData.current = ""
+        const currentUserData = await retrieveUserData()
+        userData.current = currentUserData
         setIsUserLoggedIn(true)
+
         router.push("/vault")
       }
 
