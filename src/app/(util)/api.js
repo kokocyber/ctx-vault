@@ -22,6 +22,29 @@ export async function fetchCategories(userId) {
   }
 }
 
+export async function fetchCurrentUserData() {
+  try {
+    const response = await fetch(`/api/v1/user/me`);
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !response.ok ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      const errorText = await response.text();
+      console.error("Error fetching user data:", errorText);
+      throw new Error("Failed to fetch user data");
+    }
+
+    const data = await response.json();
+    return data.categories;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
 // create Category for user
 export async function createCategory(userId, name) {
   try {

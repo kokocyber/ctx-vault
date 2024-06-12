@@ -19,14 +19,14 @@ import { UserContext } from "../(context)/UserContextComponent";
 import { useContext } from "react";
 
 export function Navbar(props) {
-  const { userData, isUserLoggedIn } = useContext(UserContext)
+  const { userData, isUserLoggedIn } = useContext(UserContext);
 
-  var firstName = ":"
-  var lastName = ")"
+  var firstName = ":";
+  var lastName = ")";
 
-  if(userData.current !== "") {
-    firstName = userData.current.id.user.firstName
-    lastName = userData.current.id.user.lastName
+  if (userData.current !== "") {
+    firstName = userData.current.id.user.firstName;
+    lastName = userData.current.id.user.lastName;
   }
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -108,7 +108,7 @@ export function Navbar(props) {
                 display: "flex",
                 alignItems: "center",
                 textAlign: "center",
-                display: isUserLoggedIn ? "block": "none"
+                display: isUserLoggedIn ? "block" : "none",
               }}
             >
               <Tooltip title="Account settings">
@@ -129,7 +129,6 @@ export function Navbar(props) {
               </Tooltip>
             </Box>
             <Menu
-              
               anchorEl={anchorEl}
               id="account-menu"
               open={open}

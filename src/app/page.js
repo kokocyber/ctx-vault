@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
 import { Button, Grid } from "@mui/material";
 import Link from "next/link";
+import "./globals.css";
 import "./page.model.css";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import { Navbar } from "./(components)/Navbar";
@@ -11,25 +12,25 @@ import { UserContext } from "./(context)/UserContextComponent";
 import { useContext, useEffect, useState } from "react";
 
 export default function Home() {
-  const { isUserLoggedIn } = useContext(UserContext)
+  const { isUserLoggedIn } = useContext(UserContext);
 
-  const [iconText, setIconText] = useState("Get started")
-  const [iconHref, setIconHref] = useState("/login")
+  const [iconText, setIconText] = useState("Get started");
+  const [iconHref, setIconHref] = useState("/login");
 
   useEffect(() => {
-    switch(isUserLoggedIn) {
+    switch (isUserLoggedIn) {
       case true:
-        setIconText("To your vault")
-        setIconHref("/vault")
+        setIconText("To your vault");
+        setIconHref("/vault");
         break;
       case false:
-        setIconText("Get started")
-        setIconHref("/login")
+        setIconText("Get started");
+        setIconHref("/login");
         break;
       default:
         break;
     }
-  }, [isUserLoggedIn])
+  }, [isUserLoggedIn]);
 
   return (
     <>
@@ -48,6 +49,7 @@ export default function Home() {
             <Button
               variant="contained"
               color="secondary"
+              size="large"
               startIcon={<RocketLaunchIcon />}
             >
               {iconText}

@@ -5,12 +5,11 @@ import UserContextComponent from "./(context)/UserContextComponent";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Equinox",
-  description: "Trustworthy password manager",
+  title: "Equinox - Password Manager",
+  description: "Your trustworthy password manager",
 };
 
 export default function RootLayout({ children }) {
-
   return (
     <html lang="en">
       <UserContextComponent>
