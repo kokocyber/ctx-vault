@@ -34,6 +34,10 @@ import {
   deleteCategory,
 } from "../(util)/api";
 
+import { UserContext } from "../(context)/UserContextComponent";
+import { useContext } from "react";
+import { useRouter } from "next/navigation";
+
 const FullHeightContainer = styled(Container)({
   height: "100vh",
   display: "flex",
@@ -84,6 +88,9 @@ const TableRowHover = styled(TableRow)({
 });
 
 export default function Home() {
+  const { isUserLoggedIn, userData } = useContext(UserContext)
+  const router = useRouter()
+
   const [categoriesData, setCategoriesData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("");
   const [openAddCategory, setOpenAddCategory] = useState(false);
@@ -98,6 +105,12 @@ export default function Home() {
   const [editingCategory, setEditingCategory] = useState(null);
 
   const userId = 1; // Replace with actual userId from your authentication
+
+  useEffect(() => {
+    if(!isUserLoggedIn || userData.current === "") {
+      router.push("/")
+    } 
+  }, [])
 
   useEffect(() => {
     async function loadCategories() {
