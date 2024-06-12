@@ -1,5 +1,6 @@
 import { getSession, securePassword, validateSession } from "@/middleware/auth";
 import { PrismaClient } from "@prisma/client";
+import * as EmailValidator from "email-validator"
 
 const prisma = new PrismaClient();
 
@@ -54,6 +55,15 @@ export async function POST(request) {
     const password = searchParams.get("password")
     const firstName = searchParams.get("firstName")
     const lastName = searchParams.get("lastName")
+
+    const passwordValidation = passwordSchema.validate(password, { details: true })
+    const firstNameValidation = nameSchema.validate(firstName, { details: true })
+    const lastNameValidation = nameSchema.validate(lastName, { details: true })
+    const emailValidation = EmailValidator.validate(email)
+
+    if(!emailValidation || lastNameValidation.length !== 0 || firstNameValidation.length !== 0 || passwordValidation.length !== 0) {
+        return Response.json({"error": "Validation failed"})
+    }
 
     const hashedPassword = securePassword(password)
 

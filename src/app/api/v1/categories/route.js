@@ -82,7 +82,8 @@ export async function POST(request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = parseInt(searchParams.get("id"));
-    const name = searchParams.get("name");
+    const name = searchParams.get("categoryName");
+
 
     const session = await getSession();
     if (!session) {

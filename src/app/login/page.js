@@ -28,6 +28,7 @@ import { UserContext } from "../(context)/UserContextComponent";
 import { useContext } from "react";
 import { verifyCookie } from "../(util)/api";
 import toast from "react-hot-toast";
+import { schema } from "../(util)/validator";
 
 function Copyright(props) {
   return (
