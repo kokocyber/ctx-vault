@@ -3,6 +3,7 @@
     font-size: xx-large;
     display: flex;
     justify-content: center;
+    color: #9c27b0;
 }
 
 .time {
@@ -15,6 +16,8 @@
 
 .description {
     font-size: large;
+    color: white;
+    font-weight: bold;
 }
 
 .small {
@@ -22,7 +25,8 @@
 }
 
 .paperStyle {
-   opacity: 65%;
+   /* opacity: 65%; */
+   background-color: black;
     padding: 5%;
     transition: 0.3s;
     border-radius: 27px 27px 27px 27px;

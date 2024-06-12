@@ -3,7 +3,6 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import { verifyCookie } from "../(util)/api";
 import toast, { Toaster } from "react-hot-toast";
-import { Box } from "@mui/material";
 
 export const UserContext = createContext();
 
