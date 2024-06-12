@@ -1,6 +1,8 @@
 import { getSession, securePassword, validateSession } from "@/middleware/auth";
 import { PrismaClient } from "@prisma/client";
 import * as EmailValidator from "email-validator";
+import { passwordSchema } from "@/app/(util)/validator";
+import { nameSchema } from "@/app/(util)/validator";
 
 const prisma = new PrismaClient();
 

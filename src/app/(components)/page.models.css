@@ -8,10 +8,12 @@
 
 .time {
     font-size: medium;
+    color: white;
 }
 
 .price {
     font-size: x-large;
+    color: orange;
 }
 
 .description {
@@ -25,7 +27,7 @@
 }
 
 .paperStyle {
-   /* opacity: 65%; */
+   opacity: 75%;
    background-color: black;
     padding: 5%;
     transition: 0.3s;

@@ -21,10 +21,10 @@ export default function About() {
             <span className="highlightOrange">Christopher</span>
           </Typography>
           <Typography variant="h1" className="aboutTitle">
-            the CEO&apos;s of Equinox
+            the CEO&apos;s of Equinox.
           </Typography>
           <Typography variant="h1" className="aboutTitle">
-            Don&apos;t have much more to tell ya
+            Don&apos;t have much more to tell ya.
           </Typography>
         </Grid>
         <Grid item xs={5} container justifyContent="center" alignItems="center">
