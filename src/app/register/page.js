@@ -16,7 +16,7 @@ import {
   InputAdornment,
   InputLabel,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import BackgroundImage from "../../../public/pic/mountains.jpg";
 import Logo from "../../../public/pic/logo.png";
 import Image from "next/image";
@@ -24,6 +24,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { register } from "../(util)/api";
+import toast from "react-hot-toast";
+import { nameSchema, passwordSchema } from "../(util)/validator";
+import * as EmailValidator from "email-validator"
 
 function Copyright(props) {
   return (
@@ -78,22 +81,44 @@ export default function SignUp() {
     setPassword(data);
   };
 
+  const toastValidation = (type, validation) => {
+    for(var error of validation) {
+      toast.error(`${type}: ${error.message}`)
+    }
+  }
+
   const handleRegister = async (event) => {
     event.preventDefault()
-    try {
-      const response = await register(email, password, name, lastName)
 
-      if(response.status === 201) {
-        alert("User Created, please log in")
-        router.push("/login")
+    const passwordValidation = passwordSchema.validate(password, { details: true })
+    const firstNameValidation = nameSchema.validate(name, { details: true })
+    const lastNameValidation = nameSchema.validate(lastName, { details: true })
+    const emailValidation = EmailValidator.validate(email)
+
+    if(passwordValidation.length !== 0) {
+      toastValidation("Password", passwordValidation)
+    } else if(firstNameValidation.length !== 0) {
+      toastValidation("First Name", firstNameValidation)
+    } else if(lastNameValidation.length !== 0) {
+      toastValidation("Last Name", lastNameValidation)
+    } else if(!emailValidation) {
+      toast.error("Invalid Email")
+    } else {
+      try {
+        const response = await register(email, password, name, lastName)
+  
+        if(response.status === 201) {
+          toast.success("User created, please log in")
+          router.push("/login")
+        } else if(response.status === 400) {
+          toast.error("User already exists")
+        } else {
+          toast.error("Something went wrong")
+        }
+  
+      } catch(e) {
+        console.error("Login failed:", e)
       }
-
-      if(response.status === 400) {
-        alert("User exists")
-      }
-
-    } catch(e) {
-      console.error("Login failed:", e)
     }
   }
 
