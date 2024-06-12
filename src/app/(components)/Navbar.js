@@ -14,9 +14,21 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import HttpsIcon from "@mui/icons-material/Https";
-import { logout } from "../(util)/api";
+
+import { UserContext } from "../(context)/UserContextComponent";
+import { useContext } from "react";
 
 export function Navbar(props) {
+  const { userData, isUserLoggedIn } = useContext(UserContext)
+
+  var firstName = ":"
+  var lastName = ")"
+
+  if(userData.current !== "") {
+    firstName = userData.current.id.user.firstName
+    lastName = userData.current.id.user.lastName
+  }
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -96,6 +108,7 @@ export function Navbar(props) {
                 display: "flex",
                 alignItems: "center",
                 textAlign: "center",
+                display: isUserLoggedIn ? "block": "none"
               }}
             >
               <Tooltip title="Account settings">
@@ -110,12 +123,13 @@ export function Navbar(props) {
                   <Avatar
                     className="accAvatar"
                     sx={{ width: 50, height: 50 }}
-                    {...stringAvatar("taha ali")}
+                    {...stringAvatar(`${firstName} ${lastName}`)}
                   />
                 </IconButton>
               </Tooltip>
             </Box>
             <Menu
+              
               anchorEl={anchorEl}
               id="account-menu"
               open={open}
