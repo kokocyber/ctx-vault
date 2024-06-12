@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { UserContext } from "../(context)/UserContextComponent";
 import { useContext } from "react";
 import { verifyCookie } from "../(util)/api";
+import toast from "react-hot-toast";
 
 function Copyright(props) {
   return (
@@ -84,21 +85,20 @@ export default function SignIn() {
     event.preventDefault()
     try {
       const response = await login(email, password)
+      console.log(response)
 
-      if(response.data.session) {
+      if(response.status === 401) {
+        toast.error("Wrong password")
+      } else if(response.status === 404) {
+        toast.error("User not found")
+      } else {
+        toast.success("Successfully logged in")
         const currentUserData = await retrieveUserData()
         userData.current = currentUserData
         setIsUserLoggedIn(true)
 
         router.push("/vault")
       }
-
-      if(response.status === 404) {
-        alert("User not found")
-      } else if(response.status === 401) {
-        alert("Wrong password")
-      }
-
     } catch(e) {
       console.error("Login failed:", e)
     }

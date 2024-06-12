@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import {
   styled,
   Table,
@@ -37,6 +37,7 @@ import {
 import { UserContext } from "../(context)/UserContextComponent";
 import { useContext } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const FullHeightContainer = styled(Container)({
   height: "100vh",
@@ -106,11 +107,12 @@ export default function Home() {
 
   const userId = 1; // Replace with actual userId from your authentication
 
-  // useEffect(() => {
-  //   if (!isUserLoggedIn || userData.current === "") {
-  //     router.push("/");
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (!isUserLoggedIn || userData.current === "") {
+      toast.error("You are not logged in");
+      router.push("/");
+    }
+  }, []);
 
   useEffect(() => {
     async function loadCategories() {
