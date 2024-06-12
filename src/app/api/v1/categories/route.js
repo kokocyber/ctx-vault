@@ -141,12 +141,14 @@ export async function DELETE(request) {
   const { searchParams } = new URL(request.url);
   const userId = parseInt(searchParams.get("id"));
   const categoryId = parseInt(searchParams.get("categoryId"));
+
   try {
     const session = await getSession();
     if (!session) {
       return Response.json({ Unauthorized: "Not logged in!" }, { status: 401 });
     }
     if (session.user.id !== userId && session.user.role !== "Admin") {
+      console.log(session.user.id, userId)
       return Response.json(
         { Unauthorized: "Not enough permission!" },
         { status: 403 }

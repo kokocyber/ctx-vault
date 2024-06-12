@@ -45,9 +45,10 @@ export async function fetchCurrentUserData() {
   }
 }
 
+// create Category for user
 export async function createCategory(userId, name) {
   try {
-    const response = await fetch(`/api/categories?id=${userId}&name=${name}`, {
+    const response = await fetch(`/api/v1/categories?id=${userId}&categoryName=${name}`, {
       method: "POST",
     });
     const contentType = response.headers.get("content-type");
@@ -70,10 +71,11 @@ export async function createCategory(userId, name) {
   }
 }
 
+// update category
 export async function updateCategory(categoryId, userId, name) {
   try {
     const response = await fetch(
-      `/api/categories?categoryId=${categoryId}&id=${userId}&name=${name}`,
+      `/api/v1/categories?categoryId=${categoryId}&id=${userId}&name=${name}`,
       {
         method: "PUT",
       }
@@ -98,10 +100,12 @@ export async function updateCategory(categoryId, userId, name) {
   }
 }
 
+
+// deletes category for user
 export async function deleteCategory(categoryId, userId) {
   try {
     const response = await fetch(
-      `/api/categories?categoryId=${categoryId}&id=${userId}`,
+      `/api/v1/categories?categoryId=${categoryId}&id=${userId}`,
       {
         method: "DELETE",
       }
@@ -119,7 +123,7 @@ export async function deleteCategory(categoryId, userId) {
     }
 
     const data = await response.json();
-    return data["Deleted"];
+    return data;
   } catch (error) {
     console.error("Error:", error);
     throw error;
