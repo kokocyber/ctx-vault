@@ -1,0 +1,8 @@
+.aboutTitle {
+    color: white;
+    font-size: 400%;
+}
+
+.shape {
+    clip-path: circle(50% at 50% 50%);
+}

@@ -1,8 +1,4 @@
-.title {
+.notFoundTitle {
+    color: white;
     font-size: 400%;
-}
-
-body{
-    background: rgb(230,142,59);
-    background: linear-gradient(90deg, rgba(230,142,59,0.891281512605042) 0%, rgba(248,181,244,1) 100%);
 }
