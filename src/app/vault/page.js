@@ -29,7 +29,16 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { UserContext } from "../(context)/UserContextComponent";
 import toast from "react-hot-toast";
-import { createCategory, createPassword, deleteCategory, deletePassword, fetchCurrentUserData, updateCategory, updatePassword, verifyCookie } from "../(util)/api";
+import {
+  createCategory,
+  createPassword,
+  deleteCategory,
+  deletePassword,
+  fetchCurrentUserData,
+  updateCategory,
+  updatePassword,
+  verifyCookie,
+} from "../(util)/api";
 
 const initialCategoriesData = {
   1: {
@@ -90,15 +99,16 @@ const TableRowHover = styled(TableRow)({
 });
 
 export default function Home() {
-  const { userData, isLoggedIn } = useContext(UserContext);
+  const { currentUserData, setCurrentUserData, isLoggedIn } =
+    useContext(UserContext);
   const userId = useRef("");
 
   useEffect(() => {
-    if (userData.current !== "" || isLoggedIn) {
-      setCategoriesData(userData.current["user data"]);
-      userId.current = userData.current.id.user.id;
+    if (currentUserData.current !== "" || isLoggedIn) {
+      setCategoriesData(currentUserData["user data"]);
+      userId.current = currentUserData.id.user.id;
     }
-  }, [userData, isLoggedIn]);
+  }, [currentUserData, isLoggedIn]);
 
   const [categoriesData, setCategoriesData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState(

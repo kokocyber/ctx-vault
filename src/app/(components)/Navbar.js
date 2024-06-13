@@ -20,14 +20,31 @@ import { useContext } from "react";
 import { useEffect } from "react";
 
 export function Navbar(props) {
-  const { userData, setUserData, isUserLoggedIn } = useContext(UserContext);
+  const { currentUserData, setCurrentUserData, isUserLoggedIn } =
+    useContext(UserContext);
 
   var firstName = ":";
   var lastName = ")";
 
   useEffect(() => {
-    let data = sessionStorage.getItem("userData");
-    setUserData(data);
+    let data = JSON.parse(sessionStorage.getItem("currentUserData"));
+    setCurrentUserData(data);
+
+    if (data) {
+      firstName = data.id.user.firstName;
+      sessionStorage.setItem("firstName", firstName);
+      lastName = data.id.user.lastName;
+      sessionStorage.setItem("lastName", lastName);
+      console.log(data);
+    }
+  }, []);
+
+  useEffect(() => {
+    let name = sessionStorage.getItem("firstName");
+    let lName = sessionStorage.getItem("lastName");
+
+    firstName = name;
+    lastName = lName;
   }, []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);

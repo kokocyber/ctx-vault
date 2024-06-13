@@ -44,7 +44,7 @@ export default function Account() {
     setCurrentUserData(JSON.parse(data));
   }, []);
 
-  const user = userData?.current?.id?.user;
+  const user = currentUserData?.id?.user;
   const firstName = user?.firstName;
 
   const handleChangeName = (event) => {
