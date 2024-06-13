@@ -42,6 +42,8 @@ import {
 import "./page.model.css";
 import { useRouter } from "next/navigation";
 
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
 const initialCategoriesData = {
   1: {
     id: 1,
@@ -296,6 +298,14 @@ export default function Home() {
     }
   };
 
+  const handleUsernameCopy = (username) => {
+    console.log(username)
+  }
+
+  const handlePasswordCopy = (password) => {
+    console.log(password)
+  }
+
   return (
     <FullHeightContainer>
       <FullHeightPaper style={{ flex: "0 0 25%" }}>
@@ -422,6 +432,11 @@ export default function Home() {
                         </TableCell>
                         <TableCell>
                           <ActionButtons className="action-buttons">
+                            <IconButton
+                              onClick={handlePasswordCopy(row)}
+                            >
+                              <ContentCopyIcon />
+                            </IconButton>
                             <IconButton
                               onClick={() => handleEditPasswordOpen(row)}
                             >
