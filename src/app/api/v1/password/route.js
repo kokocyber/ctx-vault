@@ -109,6 +109,7 @@ export async function POST(request) {
 
     const encryptionKey = sha512_256(secretKey);
     const encryptedPassword = encryptText(password, encryptionKey);
+    const encryptedUsername = encryptText(username, encryptionKey);
 
     const session = await getSession();
     if (!session) {
@@ -122,7 +123,7 @@ export async function POST(request) {
     }
     const createdPassword = await createPassword(
       name,
-      username,
+      encryptedUsername,
       encryptedPassword,
       categoryId
     );

@@ -43,6 +43,10 @@ import "./page.model.css";
 import { useRouter } from "next/navigation";
 
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { decryptText } from "@/middleware/encryption";
+import { sha512_256 } from "js-sha512";
+
+const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY
 
 const initialCategoriesData = {
   1: {
@@ -106,7 +110,7 @@ const TableRowHover = styled(TableRow)({
 
 export default function Home() {
   const router = useRouter();
-  const { currentUserData, setCurrentUserData, isLoggedIn } =
+  const { currentUserData, setCurrentUserData, isUserLoggedIn } =
     useContext(UserContext);
   const userId = useRef("");
 
@@ -134,7 +138,7 @@ export default function Home() {
     // } else {
     //   router.push("/login");
     // }
-  }, [currentUserData, isLoggedIn, router]);
+  }, [currentUserData, isUserLoggedIn, router]);
 
   const [categoriesData, setCategoriesData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState(
@@ -418,7 +422,7 @@ export default function Home() {
                             whiteSpace: "nowrap",
                           }}
                         >
-                          {row.username}
+                          {decryptText(row.username, sha512_256(secretKey))}
                         </TableCell>
                         <TableCell
                           style={{
@@ -428,7 +432,7 @@ export default function Home() {
                             whiteSpace: "nowrap",
                           }}
                         >
-                          {row.password}
+                          {decryptText(row.password, sha512_256(secretKey))}
                         </TableCell>
                         <TableCell>
                           <ActionButtons className="action-buttons">

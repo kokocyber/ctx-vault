@@ -53,7 +53,7 @@ const toastValidation = (type, validation) => {
 
 export default function Account() {
 
-  const { currentUserData, setCurrentUserData } = useContext(UserContext);
+  const { currentUserData, setCurrentUserData, isUserLoggedIn } = useContext(UserContext);
 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -63,6 +63,9 @@ export default function Account() {
   const nameTitle = useRef("")
 
   const router = useRouter();
+
+  const [isCooldown, setIsCooldown] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(0);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -96,34 +99,50 @@ export default function Account() {
   };
 
 const handleUpdateAccount = async() => {
-
-  const firstNameValidation = nameSchema.validate(name, { details: true })
-  const lastNameValidation = nameSchema.validate(lastName, { details: true })
-  const passwordValidation = passwordSchema.validate(password, { details: true })
-
-  if(firstNameValidation.length !== 0){
-    toastValidation("First Name", firstNameValidation)
-  } else if(lastNameValidation.length !== 0) {
-    toastValidation("Last Name", lastNameValidation)
-  } else if(passwordValidation.length !== 0 && password !== "") {
-    toastValidation("Password", passwordValidation)
-  } else if(name !== currentUserData.id.user.firstName || lastName !== currentUserData.id.user.lastName || password !== "") {
-    try{
-      const response = updateUser(currentUserData.id.user.id, name, lastName, password)
-      
-      const newUserData = await verifyCookie();
-      setCurrentUserData(newUserData);
-      toast.success("User updated")
-      router.push("/logout")
-      router.push("/login")
-      toast.success("Please login again")
-    } catch(e) {
-      console.error(e)
-      toast.error("Failed updating user")
+  if (!isCooldown) {
+    const firstNameValidation = nameSchema.validate(name, { details: true })
+    const lastNameValidation = nameSchema.validate(lastName, { details: true })
+    const passwordValidation = passwordSchema.validate(password, { details: true })
+  
+    if(firstNameValidation.length !== 0){
+      toastValidation("First Name", firstNameValidation)
+    } else if(lastNameValidation.length !== 0) {
+      toastValidation("Last Name", lastNameValidation)
+    } else if(passwordValidation.length !== 0 && password !== "") {
+      toastValidation("Password", passwordValidation)
+    } else if(name !== currentUserData.id.user.firstName || lastName !== currentUserData.id.user.lastName || password !== "") {
+      try{
+        const response = updateUser(currentUserData.id.user.id, name, lastName, password)
+        
+        const newUserData = await verifyCookie();
+        setCurrentUserData(newUserData);
+        toast.success("User updated")
+        router.push("/logout")
+        router.push("/login")
+        toast.success("Please login again")
+      } catch(e) {
+        console.error(e)
+        toast.error("Failed updating user")
+      }
+    } else {
+      toast("Fields are the same")
     }
+    
+    setIsCooldown(true);
+    setSecondsLeft(30); 
+    const countdownInterval = setInterval(() => {
+      setSecondsLeft(prevSeconds => {
+        if (prevSeconds === 1) {
+          clearInterval(countdownInterval);
+          setIsCooldown(false);
+        }
+        return prevSeconds - 1;
+      });
+    }, 1000);
   } else {
-    toast("Fields are the same")
+    toast.error(`Cooldown: ${secondsLeft}s left`)
   }
+
 }
 
   return (
