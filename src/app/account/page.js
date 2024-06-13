@@ -20,20 +20,32 @@ import { useContext } from "react";
 import { UserContext } from "../(context)/UserContextComponent";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Account() {
-  const { userData } = useContext(UserContext);
+  const { currentUserData, setCurrentUserData } = useContext(UserContext);
 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
 
+  const router = useRouter();
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
+  useEffect(() => {
+    let data = sessionStorage.getItem("currentUserData");
+    setCurrentUserData(JSON.parse(data));
+  }, []);
+
+  const user = userData?.current?.id?.user;
+  const firstName = user?.firstName;
 
   const handleChangeName = (event) => {
     let data = event.target.value;
@@ -57,8 +69,7 @@ export default function Account() {
         <Grid item xs={12} textAlign="center">
           <h1 className="accountTitle">
             Hey,
-            {/* <span className="highlightOrange">{userData.firstName}</span> */}
-            <span className="highlightOrange"> {userData.current.id.user.firstName} :)</span>
+            <span className="highlightOrange">{firstName}</span>
           </h1>
         </Grid>
         <Grid item xs={4}>
@@ -106,11 +117,13 @@ export default function Account() {
           </FormControl>
         </Grid>
       </Grid>
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        padding: 3
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          padding: 3,
+        }}
+      >
         <Button>Update</Button>
       </div>
     </>

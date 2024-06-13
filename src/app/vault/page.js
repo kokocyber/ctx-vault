@@ -78,7 +78,8 @@ const sampleData = {
 };
 
 export default function Vault() {
-  const { userData, isUserLoggedIn } = useContext(UserContext);
+  const { currentUserData, isUserLoggedIn, setCurrentUserData } =
+    useContext(UserContext);
   const [data, setData] = useState({});
   const [openAddCategory, setOpenAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -93,16 +94,21 @@ export default function Vault() {
     username: "",
     password: "",
   });
+  const [userId, setUserId] = useState();
   const router = useRouter();
-  const userId = useRef("");
 
   useEffect(() => {
-    if (!isUserLoggedIn || userData.current === "") {
+    let data = sessionStorage.getItem("currentUserData");
+    setCurrentUserData(JSON.parse(data));
+  });
+
+  useEffect(() => {
+    if (!isUserLoggedIn || userData === "") {
       toast.error("You are not logged in");
       router.push("/");
       return;
     }
-    userId.current = userData.current.id.user.id;
+    setUserId(userData.id.user.id);
 
     console.log(userId, userData.current);
 

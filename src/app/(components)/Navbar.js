@@ -17,17 +17,18 @@ import HttpsIcon from "@mui/icons-material/Https";
 
 import { UserContext } from "../(context)/UserContextComponent";
 import { useContext } from "react";
+import { useEffect } from "react";
 
 export function Navbar(props) {
-  const { userData, isUserLoggedIn } = useContext(UserContext);
+  const { userData, setUserData, isUserLoggedIn } = useContext(UserContext);
 
   var firstName = ":";
   var lastName = ")";
 
-  if (userData.current !== "") {
-    firstName = userData.current.id.user.firstName;
-    lastName = userData.current.id.user.lastName;
-  }
+  useEffect(() => {
+    let data = sessionStorage.getItem("userData");
+    setUserData(data);
+  }, []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);

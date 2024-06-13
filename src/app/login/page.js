@@ -49,22 +49,25 @@ function Copyright(props) {
 }
 
 async function retrieveUserData() {
-  const response = await verifyCookie()
-  if(response.id) {
-    return response
+  const response = await verifyCookie();
+  if (response.id) {
+    return response;
   }
 }
 
 export default function SignIn() {
- 
-  const router = useRouter()
+  const router = useRouter();
 
-  const { isUserLoggedIn, setIsUserLoggedIn, userData } = useContext(UserContext)
+  const {
+    isUserLoggedIn,
+    setIsUserLoggedIn,
+    currentUserData,
+    setCurrentUserData,
+  } = useContext(UserContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -83,27 +86,31 @@ export default function SignIn() {
   };
 
   const handleLogin = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     try {
-      const response = await login(email, password)
-      console.log(response)
+      const response = await login(email, password);
+      console.log(response);
 
-      if(response.status === 401) {
-        toast.error("Wrong password")
-      } else if(response.status === 404) {
-        toast.error("User not found")
+      if (response.status === 401) {
+        toast.error("Wrong password");
+      } else if (response.status === 404) {
+        toast.error("User not found");
       } else {
-        toast.success("Successfully logged in")
-        const currentUserData = await retrieveUserData()
-        userData.current = currentUserData
-        setIsUserLoggedIn(true)
+        toast.success("Successfully logged in");
+        const currentUserData = await retrieveUserData();
+        setCurrentUserData(currentUserData);
+        sessionStorage.setItem(
+          "currentUserData",
+          JSON.stringify(currentUserData)
+        );
+        setIsUserLoggedIn(true);
 
-        router.push("/vault")
+        router.push("/vault");
       }
-    } catch(e) {
-      console.error("Login failed:", e)
+    } catch (e) {
+      console.error("Login failed:", e);
     }
-  }
+  };
 
   return (
     <Grid container component="main" sx={{ height: "100vh" }}>
@@ -127,7 +134,12 @@ export default function SignIn() {
           }}
         >
           <Image width={250} height="auto" src={Logo} alt="Logo" />
-          <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={handleLogin}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <Grid container rowGap={4} justifyContent="center">
               <Grid item xs={10}>
                 <TextField
