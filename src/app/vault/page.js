@@ -23,6 +23,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import EditIcon from "@mui/icons-material/Edit";
@@ -42,7 +43,7 @@ import {
 import "./page.model.css";
 import { useRouter } from "next/navigation";
 
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const initialCategoriesData = {
   1: {
@@ -298,13 +299,23 @@ export default function Home() {
     }
   };
 
-  const handleUsernameCopy = (username) => {
-    console.log(username)
-  }
-
-  const handlePasswordCopy = (password) => {
-    console.log(password)
-  }
+  const handlePasswordCopy = (type) => async () => {
+    try {
+      console.log(selected);
+      const { username, password } = await fetchPasswordFromDB(
+        currentUserData.id.user.id
+      );
+      if (type === "username") {
+        setCopyUsername(username);
+      } else if (type === "password") {
+        setCopyPassword(password);
+      }
+      navigator.clipboard.writeText(type === "username" ? username : password);
+      alert(`Copied ${type} to clipboard!`);
+    } catch (error) {
+      console.error("Error fetching password:", error);
+    }
+  };
 
   return (
     <FullHeightContainer>
@@ -432,11 +443,20 @@ export default function Home() {
                         </TableCell>
                         <TableCell>
                           <ActionButtons className="action-buttons">
-                            <IconButton
-                              onClick={handlePasswordCopy(row)}
-                            >
-                              <ContentCopyIcon />
-                            </IconButton>
+                            <Tooltip title="to be implemented">
+                              <IconButton
+                              // onClick={handlePasswordCopy("username")}
+                              >
+                                <ContentCopyIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="to be implemented">
+                              <IconButton
+                              // onClick={handlePasswordCopy("password")}
+                              >
+                                <ContentCopyIcon />
+                              </IconButton>
+                            </Tooltip>
                             <IconButton
                               onClick={() => handleEditPasswordOpen(row)}
                             >
