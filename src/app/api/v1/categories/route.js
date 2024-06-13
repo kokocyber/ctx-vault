@@ -43,6 +43,12 @@ async function updateCategory(categoryId, newCategoryName) {
 
 // deletes category for user
 async function deleteCategory(categoryId) {
+  await prisma.password.deleteMany({
+    where: {
+      categoryId: categoryId,
+    },
+  });
+  
   const data = await prisma.category.delete({
     where: {
       id: categoryId,
