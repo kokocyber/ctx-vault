@@ -15,7 +15,7 @@ async function logoutUser() {
 export default function Logout() {
     const router = useRouter()
 
-    const { isUserLoggedIn, setIsUserLoggedIn, userData } = useContext(UserContext)
+    const { isUserLoggedIn, setIsUserLoggedIn, setCurrentUserData } = useContext(UserContext)
 
     useEffect(() => {
         if(isUserLoggedIn) {
@@ -23,7 +23,7 @@ export default function Logout() {
                 .then((response) => {
                     toast.success("Successfully logged out")
                     setIsUserLoggedIn(false)
-                    userData.current = ""
+                    setCurrentUserData("")
                     router.push("/")
                 })
         } else {
