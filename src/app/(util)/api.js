@@ -286,7 +286,7 @@ export async function deletePassword(id, passwordId) {
 export async function updatePassword(id, passwordId, name, username, password) {
   try {
     const response = await fetch(`/api/v1/password?id=${id}&passwordId=${passwordId}&name=${name}&username=${username}&password=${password}`, {
-      method: "DELETE",
+      method: "PUT",
     });
     const contentType = response.headers.get("content-type");
 
