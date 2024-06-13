@@ -313,6 +313,7 @@ export default function Home() {
             <Typography className="vaultTitle" variant="h6">
               {selectedCategory} Passwords
             </Typography>
+            <Typography variant="h6">{categoriesData[selectedCategory]?.name} Passwords</Typography>
             <Button
               variant="contained"
               color="primary"
