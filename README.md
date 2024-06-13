@@ -69,7 +69,15 @@ Unsere implementierte Endpoints
 | PUT /api/v1/password | Bearbeitet Passwort in Kategorie für Nutzer |
 
 
-## Datenabspeicherung
+## Datenabspeicherung & Sicherheit
+
+In unserem Projekt legen wir besonderen Wert auf die Sicherheit der Datenabspeicherung. Alle API-Endpunkte sind durch JWT (JSON Web Token) geschützt, was sicherstellt, dass nur autorisierte Benutzer auf die Daten zugreifen können.
+
+Zur Sicherung sensibler Informationen verwenden wir AES (Advanced Encryption Standard) mit einem sicheren Secret Key, um Passwörter zu verschlüsseln. Dadurch wird sichergestellt, dass die Passwörter selbst in der Datenbank sicher gespeichert sind und nur autorisierte Anwendungen diese entschlüsseln können.
+
+Das Master-Passwort der Benutzer wird gehasht und mit einem "Salt" versehen, bevor es gespeichert wird. Diese Maßnahme erhöht die Sicherheit erheblich, indem sie den Zugriff auf das Master-Passwort selbst bei einem Datenbankangriff erschwert.
+
+Diese Sicherheitsmaßnahmen sind integraler Bestandteil unserer Datenabspeicherung, um die Vertraulichkeit und Integrität der Nutzerdaten zu gewährleisten und gleichzeitig die Anforderungen an moderne Sicherheitsstandards zu erfüllen.
 
 ## Seiten
 | Link | Nutzen |
@@ -88,7 +96,7 @@ Unsere implementierte Endpoints
 |  |  |
 | /account | Seite zu deinem Account, wo man den Vor- und Nachnamen sowie das Passwort ändern kann |
 |  |  |
-| /vault | Passwort Vaul Seite |
+| /vault | Passwort Vault Seite |
 
 ## Reflexion
 
@@ -98,3 +106,12 @@ Das Password-Safe-Projekt war sehr lehrreich. Beim Frontend und Backend mit Next
 Gegen Ende des Projekts hatten wir allerdings einige technische Schwierigkeiten, wie Probleme mit Paketversionen und Fehler bei den Prisma-Migrationen. Diese Probleme haben uns ziemlich gefordert, aber wir haben sie dank guter Teamarbeit und ein wenig Geduld rechtzeitig gelöst.
 
 Ich bin sehr zufrieden mit dem, was wir erreicht haben. Unsere Anwendung funktioniert gut und erfüllt alle Anforderungen, die wir an sie gestellt haben. In den kommenden Wochen wollen wir noch weiter daran arbeiten, um sie zu verbessern und die Benutzerfreundlichkeit zu erhöhen. Diese Erfahrung hat uns nicht nur technisch weitergebracht, sondern auch unser Verständnis für die Bedeutung von Sicherheit in der Softwareentwicklung vertieft. Wir haben viel darüber gelernt, wie wichtig es ist, bei der Entwicklung stets auf Sicherheit zu achten und ständig nach Verbesserungsmöglichkeiten zu suchen.
+
+### Christopher
+Das Password-Safe-Projekt war eine äußerst wertvolle Erfahrung für uns. Während wir sowohl das Frontend als auch das Backend mit Next.js entwickelten, haben wir umfassende Kenntnisse in Bezug auf Sicherheitsaspekte und modernes Design erlangt. Insbesondere die Implementierung der Anmeldefunktionen und der Passwortverwaltung stellte uns vor interessante Herausforderungen.
+
+Gegen Ende des Projekts traten jedoch einige technische Schwierigkeiten auf, die unsere Fähigkeiten auf die Probe stellten. Wir kämpften mit Problemen bei den Paketversionen von npm und hatten Schwierigkeiten mit Prisma-Migrationen. Diese Hindernisse waren anspruchsvoll, aber durch eine gute Zusammenarbeit im Team und die nötige Geduld konnten wir sie rechtzeitig überwinden.
+
+Dennoch bin ich äußerst zufrieden mit dem Erreichten. Unsere Anwendung läuft stabil und erfüllt sämtliche Anforderungen, die wir gestellt haben. In den kommenden Wochen möchten wir weiterhin an der Verbesserung der Benutzerfreundlichkeit arbeiten und die Performance optimieren. Diese Erfahrung hat nicht nur unsere technischen Fähigkeiten erweitert, sondern auch unser Bewusstsein für die Wichtigkeit von Sicherheitsaspekten in der Softwareentwicklung vertieft. Wir haben gelernt, wie entscheidend es ist, Sicherheitspraktiken kontinuierlich zu verbessern und stets auf dem neuesten Stand zu bleiben.
+
+Nächstes mal sollten wir wirklich früher den Endspurt starten, damit solche Fehler nicht kurz vor der Abgabe auftreten.
