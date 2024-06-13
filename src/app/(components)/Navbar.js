@@ -16,35 +16,38 @@ import Logout from "@mui/icons-material/Logout";
 import HttpsIcon from "@mui/icons-material/Https";
 
 import { UserContext } from "../(context)/UserContextComponent";
-import { useContext } from "react";
-import { useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 
 export function Navbar(props) {
   const { currentUserData, setCurrentUserData, isUserLoggedIn } =
     useContext(UserContext);
 
-  var firstName = ":";
-  var lastName = ")";
+  const firstName = useRef(":");
+  const lastName = useRef(")");
 
   useEffect(() => {
-    let data = JSON.parse(sessionStorage.getItem("currentUserData"));
-    setCurrentUserData(data);
-
+/*
     if (data) {
-      firstName = data.id.user.firstName;
+      firstName.current = data.id.user.firstName;
       sessionStorage.setItem("firstName", firstName);
       lastName = data.id.user.lastName;
       sessionStorage.setItem("lastName", lastName);
       console.log(data);
     }
+      */
   }, []);
 
   useEffect(() => {
-    let name = sessionStorage.getItem("firstName");
-    let lName = sessionStorage.getItem("lastName");
+    let data = JSON.parse(sessionStorage.getItem("currentUserData"));
+    setCurrentUserData(data);
 
-    firstName = name;
-    lastName = lName;
+    if(currentUserData.length !== 0) {
+      firstName.current = currentUserData.id.user.firstName
+      lastName.current = currentUserData.id.user.lastName
+    } else {
+      firstName.current = data.id.user.firstName
+      lastName.current = data.id.user.lastName
+    }
   }, []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -141,7 +144,7 @@ export function Navbar(props) {
                   <Avatar
                     className="accAvatar"
                     sx={{ width: 50, height: 50 }}
-                    {...stringAvatar(`${firstName} ${lastName}`)}
+                    {...stringAvatar(`${firstName.current} ${lastName.current}`)}
                   />
                 </IconButton>
               </Tooltip>
