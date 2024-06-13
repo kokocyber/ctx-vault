@@ -39,6 +39,7 @@ npm run dev
 ```
 
 Hinweis: Erstelle einen .env.local file mit zwei Secret keys: SECRET_KEY und NEXT_PUBLIC_SECRET_KEY
+-> Beide Secrets müssen identisch sein !!!
 
 ## Endpoints
 
