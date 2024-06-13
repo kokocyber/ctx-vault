@@ -159,11 +159,44 @@ export default function Home() {
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingPassword, setEditingPassword] = useState(null);
 
+  const setNewDPassword = (password) => {
+    if(openEditPassword || openAddPassword) {
+      setNewPassword(password)
+      return
+    }
+
+    var newDPassword = {"name": "", "username": "", "password": ""}
+    if(password.name !== "") {
+      newDPassword.name = password.name
+    }
+    if(password.username !== "") {
+      newDPassword.username = decryptText(password.username, sha512_256(secretKey))
+    }
+    if(password.password !== "") {
+      newDPassword.password = decryptText(password.password, sha512_256(secretKey))
+    }
+    setNewPassword(newDPassword)
+  }
+
+  const setNewOCategory = (category) => {
+    if(openEditCategory || openAddCategory) {
+      setNewCategory(category)
+      return
+    }
+
+    var newOCateogry = ""
+    if(category !== "") {
+      newOCateogry = categoriesData[category].name
+    }
+    setNewCategory(newOCateogry)
+  }
+
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
   };
 
   const handleAddCategoryOpen = () => {
+    setNewOCategory("")
     setOpenAddCategory(true);
   };
 
@@ -181,7 +214,7 @@ export default function Home() {
 
   const handleEditCategoryOpen = (category) => {
     setEditingCategory(category);
-    setNewCategory(category);
+    setNewOCategory(category);
     setOpenEditCategory(true);
   };
 
@@ -192,7 +225,7 @@ export default function Home() {
 
   const handleEditPasswordOpen = (password) => {
     setEditingPassword(password);
-    setNewPassword(password);
+    setNewDPassword(password);
     setOpenEditPassword(true);
   };
 
@@ -203,7 +236,6 @@ export default function Home() {
 
   const handleAddCategory = async () => {
     try {
-      console.log(userId);
       const response = await createCategory(userId.current, newCategory);
       const newUserData = await verifyCookie();
 
@@ -212,7 +244,7 @@ export default function Home() {
       toast.error("Failed adding category");
       console.error(e);
     }
-    setNewCategory("");
+    setNewOCategory("");
     handleAddCategoryClose();
   };
 
@@ -232,7 +264,7 @@ export default function Home() {
       toast.error("Failed added password");
       console.error(e);
     }
-    setNewPassword({ name: "", username: "", password: "" });
+    setNewDPassword({ name: "", username: "", password: "" });
     handleAddPasswordClose();
   };
 
@@ -255,7 +287,6 @@ export default function Home() {
   };
 
   const handleDeletePassword = async (index) => {
-    console.log(index, categoriesData[selectedCategory].passwords[index].id);
     try {
       const response = await deletePassword(
         userId.current,
@@ -288,6 +319,8 @@ export default function Home() {
   };
 
   const handleDeleteCategory = async (category) => {
+    console.log(selectedCategory)
+    console.log(categoriesData)
     try {
       const response = await deleteCategory(
         categoriesData[category].id,
@@ -302,23 +335,15 @@ export default function Home() {
     }
   };
 
-  const handlePasswordCopy = (type) => async () => {
-    try {
-      console.log(selected);
-      const { username, password } = await fetchPasswordFromDB(
-        currentUserData.id.user.id
-      );
-      if (type === "username") {
-        setCopyUsername(username);
-      } else if (type === "password") {
-        setCopyPassword(password);
-      }
-      navigator.clipboard.writeText(type === "username" ? username : password);
-      alert(`Copied ${type} to clipboard!`);
-    } catch (error) {
-      console.error("Error fetching password:", error);
-    }
-  };
+  const handleUsernameCopy = (username) => {
+    navigator.clipboard.writeText(decryptText(username, sha512_256(secretKey)))
+    toast.success("Copied username into Clipboard")
+  }
+
+  const handlePasswordCopy = (password) => {
+    navigator.clipboard.writeText(decryptText(password, sha512_256(secretKey)))
+    toast.success("Copied password into Clipboard")
+  }
 
   return (
     <FullHeightContainer>
@@ -343,12 +368,16 @@ export default function Home() {
               >
                 <ListItemText primary={categoriesData[key].name} />
                 <ActionButtons className="action-buttons">
-                  <IconButton onClick={() => handleEditCategoryOpen(key)}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleDeleteCategory(key)}>
-                    <DeleteIcon />
-                  </IconButton>
+                  <Tooltip title="Edit" arrow>
+                    <IconButton onClick={() => handleEditCategoryOpen(key)}>
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete" arrow>
+                    <IconButton onClick={() => handleDeleteCategory(key)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
                 </ActionButtons>
               </ListItemHover>
             );
@@ -378,7 +407,7 @@ export default function Home() {
                 <TableRow>
                   <TableCell
                     style={{
-                      maxWidth: "200px",
+                      width: "150px",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -432,7 +461,20 @@ export default function Home() {
                             whiteSpace: "nowrap",
                           }}
                         >
-                          {decryptText(row.username, sha512_256(secretKey))}
+                          <Tooltip title="Copy Username" arrow>
+                            <Button
+                              style={{
+                                width: "150px",
+                                justifyContent: "center",
+                                overflow: "hidden",
+                                whiteSpace: "nowrap",
+                                color: "black"
+                              }}
+                              onClick={() => handleUsernameCopy(row.username)}
+                            >
+                              {"••••••••••••••••"}
+                            </Button>
+                          </Tooltip>
                         </TableCell>
                         <TableCell
                           style={{
@@ -442,34 +484,37 @@ export default function Home() {
                             whiteSpace: "nowrap",
                           }}
                         >
-                          {decryptText(row.password, sha512_256(secretKey))}
+                          <Tooltip title="Copy Password" arrow>
+                            <Button
+                              style={{
+                                width: "150px",
+                                justifyContent: "center",
+                                overflow: "hidden",
+                                whiteSpace: "nowrap",
+                                color: "black"
+                              }}
+                              onClick={() => handlePasswordCopy(row.password)}
+                            >
+                              {"••••••••••••••••"}
+                            </Button>
+                          </Tooltip>
                         </TableCell>
                         <TableCell>
                           <ActionButtons className="action-buttons">
-                            <Tooltip title="to be implemented">
+                            <Tooltip title="Edit" arrow>
                               <IconButton
-                              // onClick={handlePasswordCopy("username")}
+                                onClick={() => handleEditPasswordOpen(row)}
                               >
-                                <ContentCopyIcon />
+                                <EditIcon />
                               </IconButton>
                             </Tooltip>
-                            <Tooltip title="to be implemented">
+                            <Tooltip title="Delete" arrow>
                               <IconButton
-                              // onClick={handlePasswordCopy("password")}
+                                onClick={() => handleDeletePassword(index)}
                               >
-                                <ContentCopyIcon />
+                                <DeleteIcon />
                               </IconButton>
                             </Tooltip>
-                            <IconButton
-                              onClick={() => handleEditPasswordOpen(row)}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                            <IconButton
-                              onClick={() => handleDeletePassword(index)}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
                           </ActionButtons>
                         </TableCell>
                       </TableRowHover>
@@ -501,7 +546,7 @@ export default function Home() {
             label="Category Name"
             fullWidth
             value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
+            onChange={(e) => setNewOCategory(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
@@ -527,7 +572,7 @@ export default function Home() {
             label="Category Name"
             fullWidth
             value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
+            onChange={(e) => setNewOCategory(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
@@ -554,7 +599,7 @@ export default function Home() {
             fullWidth
             value={newPassword.name}
             onChange={(e) =>
-              setNewPassword({ ...newPassword, name: e.target.value })
+              setNewDPassword({ ...newPassword, name: e.target.value })
             }
           />
           <TextField
@@ -563,7 +608,7 @@ export default function Home() {
             fullWidth
             value={newPassword.username}
             onChange={(e) =>
-              setNewPassword({ ...newPassword, username: e.target.value })
+              setNewDPassword({ ...newPassword, username: e.target.value })
             }
           />
           <TextField
@@ -572,7 +617,7 @@ export default function Home() {
             fullWidth
             value={newPassword.password}
             onChange={(e) =>
-              setNewPassword({ ...newPassword, password: e.target.value })
+              setNewDPassword({ ...newPassword, password: e.target.value })
             }
           />
         </DialogContent>
@@ -600,7 +645,7 @@ export default function Home() {
             fullWidth
             value={newPassword.name}
             onChange={(e) =>
-              setNewPassword({ ...newPassword, name: e.target.value })
+              setNewDPassword({ ...newPassword, name: e.target.value })
             }
           />
           <TextField
@@ -609,7 +654,7 @@ export default function Home() {
             fullWidth
             value={newPassword.username}
             onChange={(e) =>
-              setNewPassword({ ...newPassword, username: e.target.value })
+              setNewDPassword({ ...newPassword, username: e.target.value })
             }
           />
           <TextField
@@ -618,7 +663,7 @@ export default function Home() {
             fullWidth
             value={newPassword.password}
             onChange={(e) =>
-              setNewPassword({ ...newPassword, password: e.target.value })
+              setNewDPassword({ ...newPassword, password: e.target.value })
             }
           />
         </DialogContent>
