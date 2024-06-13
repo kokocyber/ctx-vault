@@ -32,19 +32,6 @@ import { verifyCookie } from "../(util)/api";
 
 const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY
 
-function secureClientPassword(password) {
-  try {
-      const hashedPassword = sha512(password)
-      const hashedKey = sha512(secretKey)
-
-      const superSecure = sha512_256(hashedPassword + hashedKey)
-      return superSecure
-  } catch(e) {
-      return e
-  }
-
-}
-
 const toastValidation = (type, validation) => {  
   for(var error of validation) {
     toast.error(`${type}: ${error.message}`)
