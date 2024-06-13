@@ -233,3 +233,75 @@ export async function logout() {
     throw error;
   }
 }
+
+// create password for category
+export async function createPassword(id, categoryId, name, username, password) {
+  try {
+    const response = await fetch(`/api/v1/password?id=${id}&categoryId=${categoryId}&name=${name}&username=${username}&password=${password}`, {
+      method: "POST",
+    });
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !response.ok ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return response;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+// delete password for category
+export async function deletePassword(id, passwordId) {
+  try {
+    const response = await fetch(`/api/v1/password?id=${id}&passwordId=${passwordId}`, {
+      method: "DELETE",
+    });
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !response.ok ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return response;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+// change password for category
+export async function updatePassword(id, passwordId, name, username, password) {
+  try {
+    const response = await fetch(`/api/v1/password?id=${id}&passwordId=${passwordId}&name=${name}&username=${username}&password=${password}`, {
+      method: "PUT",
+    });
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !response.ok ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return response;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
