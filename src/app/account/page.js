@@ -66,6 +66,10 @@ export default function Account() {
     setPassword(data);
   };
 
+const handleUpdateAccount = async() => {
+  
+}
+
   return (
     <>
       <Navbar />
@@ -84,6 +88,12 @@ export default function Account() {
             onChange={handleChangeName}
             variant="filled"
             fullWidth
+            InputLabelProps={{
+              style: { color: "white" },
+            }}
+            InputProps={{
+              style: { color: "white" },
+            }}
           />
         </Grid>
         <Grid item xs={4}>
@@ -94,11 +104,22 @@ export default function Account() {
             onChange={handleChangeLastName}
             variant="filled"
             fullWidth
+            InputLabelProps={{
+              style: { color: "white" },
+            }}
+            InputProps={{
+              style: { color: "white" },
+            }}
           />
         </Grid>
         <Grid item xs={8}>
           <FormControl variant="filled" fullWidth color="secondary">
-            <InputLabel>Password</InputLabel>
+            <InputLabel
+              htmlFor="filled-adornment-password"
+              style={{ color: "white" }}
+            >
+              Password
+            </InputLabel>
             <FilledInput
               fullWidth
               id="filled-adornment-password"
@@ -117,6 +138,9 @@ export default function Account() {
                   </IconButton>
                 </InputAdornment>
               }
+              inputProps={{
+                style: { color: "white" },
+              }}
             />
           </FormControl>
         </Grid>
@@ -126,9 +150,10 @@ export default function Account() {
           display: "flex",
           justifyContent: "center",
           padding: 3,
+          marginTop: "5%",
         }}
       >
-        <Button size="large" variant="contained" color="secondary">
+        <Button size="large" variant="contained" color="secondary" onClick={handleUpdateAccount}>
           Update
         </Button>
       </div>
