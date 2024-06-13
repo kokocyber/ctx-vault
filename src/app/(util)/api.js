@@ -305,3 +305,27 @@ export async function updatePassword(id, passwordId, name, username, password) {
     throw error;
   }
 }
+
+// change user data
+export async function updateUser(id, firstName, lastName, password) {
+  try {
+    const response = await fetch(`/api/v1/user/${id}?firstName=${firstName}&lastName=${lastName}&password=${password}`, {
+      method: "PUT",
+    });
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !response.ok ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return response;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}

@@ -3,7 +3,6 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import { verifyCookie } from "../(util)/api";
 import toast, { Toaster } from "react-hot-toast";
-import { useTheme } from "@emotion/react";
 
 export const UserContext = createContext();
 
