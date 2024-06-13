@@ -1,6 +1,13 @@
 # Equinox
 Christopher Taha Extreme Vault 苦い Plus Ultra
 
+## Project Team
+1. Taha Ali (azw / Sulzer AG)
+2. Cristofer sheelz (SwissRe AG)
+
+## Projektdefinition: Password-Safe
+Unser Projekt besteht darin, einen Password-Safe zu entwickeln, der als Web-Anwendung mit einem React Frontend und einem Spring Boot Backend (Können mit einverständnis der Lehrperson auch etwas anderes verwenden) realisiert wird. Benutzer können sich registrieren und anmelden, um ihre Passwörter sicher zu verwalten. Die Anwendung ermöglicht das Speichern, Anzeigen, Bearbeiten, Löschen und Hinzufügen von Zugangsdaten für Webseiten und Programme. Zusätzlich wird eine Funktion zur Änderung des Masterpassworts implementiert. Die Sicherheit der Anwendung wird durch den Einsatz einer bekannten Java-Verschlüsselungstechnik gewährleistet, wobei OWASP Top Ten Risiken beachtet werden.
+
 ## Tech
 
 Equinox benutzte folgende Technologien für die Realisierung:
@@ -64,3 +71,30 @@ Unsere implementierte Endpoints
 
 ## Datenabspeicherung
 
+## Seiten
+| Link | Nutzen |
+| ------ | ------ |
+| / | Homepage |
+|  |  |
+| /pricing | Infos zu den von uns gesetzten Preisen |
+|  |  |
+| /about | About Seite zu der Firma und deren CEO's |
+|  |  |
+| /login | User Login Seite |
+|  |  |
+| /register | User Registration Seite |
+|  |  |
+| /logout | User Logout Seite |
+|  |  |
+| /account | Seite zu deinem Account, wo man den Vor- und Nachnamen sowie das Passwort ändern kann |
+|  |  |
+| /vault | Passwort Vaul Seite |
+
+## Reflexion
+
+### Taha
+Das Password-Safe-Projekt war sehr lehrreich. Beim Frontend und Backend mit Next.js haben wir viel dazugelernt, besonders was Sicherheit und modernes Design angeht. Es war spannend, die Funktionen für das Anmelden und die Passwortverwaltung zu implementieren, und wir haben viel über die besten Praktiken in der Softwareentwicklung erfahren.
+
+Gegen Ende des Projekts hatten wir allerdings einige technische Schwierigkeiten, wie Probleme mit Paketversionen und Fehler bei den Prisma-Migrationen. Diese Probleme haben uns ziemlich gefordert, aber wir haben sie dank guter Teamarbeit und ein wenig Geduld rechtzeitig gelöst.
+
+Ich bin sehr zufrieden mit dem, was wir erreicht haben. Unsere Anwendung funktioniert gut und erfüllt alle Anforderungen, die wir an sie gestellt haben. In den kommenden Wochen wollen wir noch weiter daran arbeiten, um sie zu verbessern und die Benutzerfreundlichkeit zu erhöhen. Diese Erfahrung hat uns nicht nur technisch weitergebracht, sondern auch unser Verständnis für die Bedeutung von Sicherheit in der Softwareentwicklung vertieft. Wir haben viel darüber gelernt, wie wichtig es ist, bei der Entwicklung stets auf Sicherheit zu achten und ständig nach Verbesserungsmöglichkeiten zu suchen.
