@@ -40,12 +40,16 @@ export default function Account() {
   };
 
   useEffect(() => {
-    let data = sessionStorage.getItem("currentUserData");
-    setCurrentUserData(JSON.parse(data));
+    let data = JSON.parse(sessionStorage.getItem("currentUserData"));
+    setCurrentUserData(data);
+
+    setLastName(data.id.user.lastName);
+    setName(data.id.user.firstName);
   }, []);
 
-  const user = currentUserData?.id?.user;
-  const firstName = user?.firstName;
+  // const user = currentUserData?.id?.user;
+  // const firstName = user?.firstName;
+  // const lastName = user?.lastName;
 
   const handleChangeName = (event) => {
     let data = event.target.value;
@@ -69,7 +73,7 @@ export default function Account() {
         <Grid item xs={12} textAlign="center">
           <h1 className="accountTitle">
             Hey,
-            <span className="highlightOrange">{firstName}</span>
+            <span className="highlightOrange">{name}</span>
           </h1>
         </Grid>
         <Grid item xs={4}>
@@ -124,7 +128,9 @@ export default function Account() {
           padding: 3,
         }}
       >
-        <Button>Update</Button>
+        <Button size="large" variant="contained" color="secondary">
+          Update
+        </Button>
       </div>
     </>
   );
