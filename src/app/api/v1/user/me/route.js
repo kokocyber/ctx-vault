@@ -23,6 +23,7 @@ export async function GET() {
         if(!session) {
             return Response.json({"Unauthorized": "You are not logged in."}, { status: 403 })
         }
+
         const userData = await getUserData(session.user.id)
         return Response.json({"id": session, "user data": userData})
 

@@ -72,7 +72,7 @@ export async function POST(request) {
     firstNameValidation.length !== 0 ||
     passwordValidation.length !== 0
   ) {
-    return Response.json({ error: "Validation failed" });
+    return Response.json({ "error": "Validation failed" });
   }
 
   const hashedPassword = securePassword(password);

@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { getSession, securePassword } from "@/middleware/auth";
+import { nameSchema, passwordSchema } from "@/app/(util)/validator";
 
 const prisma = new PrismaClient();
 
@@ -64,16 +65,18 @@ export async function DELETE(request, { params }) {
 export async function PUT(request, { params }) {
     try {
         const { searchParams } = new URL(request.url)
+        console.log(params.id)
         const userId = parseInt(params.id)
 
         var newPassword = searchParams.get("password")
-        var newFirstName = searchParams.get("firstname")
-        var newLastName = searchParams.get("lastname")
+        var newFirstName = searchParams.get("firstName")
+        var newLastName = searchParams.get("lastName")
         
         const session = await getSession()
         if(!session) {
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
+        console.log(session.user.id, userId)
         if(session.user.id !== userId && session.user.role !== "Admin") {
             return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
         }
@@ -82,6 +85,10 @@ export async function PUT(request, { params }) {
         if(!newPassword) {
             newPassword = currentUser.password
         } else {
+            const passwordValidation = passwordSchema.validate(newPassword, { details: true })
+            if(passwordValidation.length !== 0) {
+                return Response.json({ "error": "Validation failed" })
+            }
             newPassword = securePassword(newPassword)
         }
         if(!newFirstName) {
@@ -89,6 +96,16 @@ export async function PUT(request, { params }) {
         }
         if(!newLastName) {
             newLastName = currentUser.lastName
+        }
+
+        const firstNameValidation = nameSchema.validate(newFirstName, { details: true })
+        const lastNameValidation = nameSchema.validate(newLastName, { details: true })
+
+        if(
+            firstNameValidation.length !== 0 ||
+            lastNameValidation.length !== 0
+        ) {
+            return Response.json({ "error": "Validation failed" })
         }
 
         const updatedUser = await updateUser(userId, newPassword, newFirstName, newLastName)
