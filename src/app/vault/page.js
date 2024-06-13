@@ -39,6 +39,8 @@ import {
   updatePassword,
   verifyCookie,
 } from "../(util)/api";
+import "./page.model.css";
+import { useRouter } from "next/navigation";
 
 const initialCategoriesData = {
   1: {
@@ -50,15 +52,17 @@ const initialCategoriesData = {
 };
 
 const FullHeightContainer = styled(Container)({
-  height: "100vh",
+  height: "90vh",
   display: "flex",
   flexDirection: "row",
-  padding: 0,
+  paddingTop: "2%",
+  maxWidth: "50%",
 });
 
 const FullHeightPaper = styled(Paper)({
   height: "100%",
-  marginRight: "8px",
+  marginRight: "2%",
+  borderRadius: "25px 25px 25px 25px",
 });
 
 const CategoryList = styled(List)({
@@ -86,7 +90,7 @@ const TableBox = styled(Box)({
 });
 
 const ToolbarBox = styled(Box)({
-  padding: "8px",
+  padding: "2%",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -99,16 +103,36 @@ const TableRowHover = styled(TableRow)({
 });
 
 export default function Home() {
+  const router = useRouter();
   const { currentUserData, setCurrentUserData, isLoggedIn } =
     useContext(UserContext);
   const userId = useRef("");
 
   useEffect(() => {
-    if (currentUserData.current !== "" || isLoggedIn) {
-      setCategoriesData(currentUserData["user data"]);
-      userId.current = currentUserData.id.user.id;
+    const data = JSON.parse(sessionStorage.getItem("currentUserData"));
+    if (data) {
+      setCurrentUserData(data);
     }
-  }, [currentUserData, isLoggedIn]);
+  }, []);
+
+  useEffect(() => {
+    if (currentUserData !== "" && currentUserData["user data"]) {
+      setCategoriesData((prevData) => {
+        // Only update state if the data has actually changed
+        if (
+          JSON.stringify(prevData) !==
+          JSON.stringify(currentUserData["user data"])
+        ) {
+          return currentUserData["user data"];
+        }
+        return prevData;
+      });
+      userId.current = currentUserData.id?.user.id;
+    }
+    // } else {
+    //   router.push("/login");
+    // }
+  }, [currentUserData, isLoggedIn, router]);
 
   const [categoriesData, setCategoriesData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState(
@@ -311,9 +335,8 @@ export default function Home() {
         <TableBox>
           <ToolbarBox>
             <Typography className="vaultTitle" variant="h6">
-              {selectedCategory} Passwords
+              {categoriesData[selectedCategory]?.name} Passwords
             </Typography>
-            <Typography variant="h6">{categoriesData[selectedCategory]?.name} Passwords</Typography>
             <Button
               variant="contained"
               color="primary"
@@ -324,14 +347,41 @@ export default function Home() {
           </ToolbarBox>
           <TableContainer
             component={Paper}
-            style={{ flex: 1, overflow: "auto" }}
+            style={{ flex: 1, maxWidth: "100%" }}
           >
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Username</TableCell>
-                  <TableCell>Password</TableCell>
+                  <TableCell
+                    style={{
+                      maxWidth: "200px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Name
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      maxWidth: "200px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Username
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      maxWidth: "200px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Password
+                  </TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -340,9 +390,36 @@ export default function Home() {
                   categoriesData[selectedCategory]["passwords"].map(
                     (row, index) => (
                       <TableRowHover key={index}>
-                        <TableCell>{row.name}</TableCell>
-                        <TableCell>{row.username}</TableCell>
-                        <TableCell>{row.password}</TableCell>
+                        <TableCell
+                          style={{
+                            maxWidth: "200px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {row.name}
+                        </TableCell>
+                        <TableCell
+                          style={{
+                            maxWidth: "200px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {row.username}
+                        </TableCell>
+                        <TableCell
+                          style={{
+                            maxWidth: "200px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {row.password}
+                        </TableCell>
                         <TableCell>
                           <ActionButtons className="action-buttons">
                             <IconButton
