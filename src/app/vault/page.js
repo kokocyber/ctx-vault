@@ -310,7 +310,7 @@ export default function Home() {
       <Box style={{ flex: "1" }}>
         <TableBox>
           <ToolbarBox>
-            <Typography variant="h6">{selectedCategory} Passwords</Typography>
+            <Typography variant="h6">{categoriesData[selectedCategory]?.name} Passwords</Typography>
             <Button
               variant="contained"
               color="primary"
