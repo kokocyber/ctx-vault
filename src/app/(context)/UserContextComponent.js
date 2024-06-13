@@ -24,10 +24,10 @@ export default function UserContextComponent({ children }) {
       verifySession().then((response) => {
         if (response.id) {
           setIsUserLoggedIn(true);
-          userData.current = response;
+          setCurrentUserData(response);
         } else {
           setIsUserLoggedIn(false);
-          userData.current = "";
+          setCurrentUserData("");
         }
       });
     }
