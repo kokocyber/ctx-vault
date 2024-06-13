@@ -196,7 +196,7 @@ export default function Home() {
   };
 
   const handleAddCategoryOpen = () => {
-    setNewCategory("")
+    setNewOCategory("")
     setOpenAddCategory(true);
   };
 
