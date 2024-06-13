@@ -41,14 +41,16 @@ export function Navbar(props) {
     let data = JSON.parse(sessionStorage.getItem("currentUserData"));
     setCurrentUserData(data);
 
-    if(currentUserData.length !== 0) {
-      firstName.current = currentUserData.id.user.firstName
-      lastName.current = currentUserData.id.user.lastName
-    } else {
-      firstName.current = data.id.user.firstName
-      lastName.current = data.id.user.lastName
+    if(isUserLoggedIn) {
+      if(currentUserData.length !== 0) {
+        firstName.current = currentUserData.id.user.firstName
+        lastName.current = currentUserData.id.user.lastName
+      } else {
+        firstName.current = data.id.user.firstName
+        lastName.current = data.id.user.lastName
+      }
     }
-  }, []);
+  }, [isUserLoggedIn]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);

@@ -22,6 +22,7 @@ export default function Logout() {
             logoutUser()
                 .then((response) => {
                     toast.success("Successfully logged out")
+                    sessionStorage.removeItem("currentUserData")
                     setIsUserLoggedIn(false)
                     setCurrentUserData("")
                     router.push("/")
