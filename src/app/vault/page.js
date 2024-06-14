@@ -212,6 +212,7 @@ export default function Home() {
   };
 
   const handleAddPasswordOpen = () => {
+    setNewDPassword({"name": "", "username": "", "password": ""})
     setOpenAddPassword(true);
   };
 
