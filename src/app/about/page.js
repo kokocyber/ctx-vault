@@ -6,6 +6,7 @@ import { Navbar } from "@/app/(components)/Navbar";
 import { Grid, Typography } from "@mui/material";
 import aboutPic from "../../../public/pic/about_pic.jpg";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function About() {
   return (
@@ -17,8 +18,20 @@ export default function About() {
             <span className="highlight">Hey,</span>
           </Typography>
           <Typography variant="h1" className="aboutTitle">
-            We&apos;re <span className="highlightOrange">Taha</span> and{" "}
-            <span className="highlightOrange">Christopher</span>
+            We&apos;re{" "}
+            <Link
+              className="noDecoration"
+              href="https://ch.linkedin.com/in/taha-ali-00b4621b7?trk=people-guest_people_search-card&original_referer=https://www.linkedin.com/"
+            >
+              <span className="highlightOrange">Taha</span>
+            </Link>{" "}
+            and{" "}
+            <Link
+              className="noDecoration"
+              href="https://ch.linkedin.com/in/christopher-scheel-80723122b/en?trk=people-guest_people_search-card&original_referer=https://www.google.com/"
+            >
+              <span className="highlightOrange">Christopher</span>
+            </Link>
           </Typography>
           <Typography variant="h1" className="aboutTitle">
             the CEO&apos;s of Equinox.
