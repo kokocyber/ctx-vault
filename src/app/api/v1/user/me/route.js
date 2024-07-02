@@ -25,14 +25,3 @@ export const GET = withSession(async (_, session) => {
         await prisma.$disconnect()
     }
 })
-/*
-export const POSTd = withSession(withPermission(async (request, session) => {
-    try {
-  
-    } catch (e) {
-      return Response.json({ "error": e.message }, { status: 404 })
-    } finally {
-      await prisma.$disconnect()
-    }
-  }))
-    */
