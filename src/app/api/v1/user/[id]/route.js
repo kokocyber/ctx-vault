@@ -1,11 +1,29 @@
 import { PrismaClient } from "@prisma/client";
-import { getSession, securePassword, withPermission, withSession } from "@/middleware/auth";
+import { getSession, securePassword } from "@/middleware/auth";
 import { nameSchema, passwordSchema } from "@/app/(util)/validator";
 
 const prisma = new PrismaClient();
 
 // deletes user
 async function deleteUser(userId) {
+    const categories = await prisma.category.findMany({
+        where: {
+            userId: userId
+        }
+    })
+    for(const category of categories) {
+        await prisma.password.deleteMany({
+            where: {
+                categoryId: category.id
+            }
+        })
+    }
+
+    await prisma.category.deleteMany({
+        where: {
+            userId: userId
+        }
+    })
     return await prisma.user.delete({
         where: {
             id: userId,
@@ -37,7 +55,7 @@ async function getUser(userId) {
 }
 
 // DELETE request
-export async function DELETEd(request, { params }) {
+export async function DELETE(request, { params }) {
     try {
         const userId = parseInt(params.id)
         const session = await getSession()
@@ -72,7 +90,6 @@ export async function PUT(request, { params }) {
         if(!session) {
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
-        console.log(session.user.id, userId)
         if(session.user.id !== userId && session.user.role !== "Admin") {
             return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
         }
