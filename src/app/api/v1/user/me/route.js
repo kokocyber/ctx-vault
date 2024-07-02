@@ -15,7 +15,7 @@ async function getUserData(userId) {
     })
 }
 
-export const GET = withSession(async (_, session) => {
+export const GET = withSession(async (request, session) => {
     try {
         const userData = await getUserData(session.user.id)
         return Response.json({ "id": session, "user data": userData })
