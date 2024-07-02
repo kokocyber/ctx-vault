@@ -1,6 +1,7 @@
 import { jwtVerify, SignJWT } from "jose";
 import { sha512, sha512_256 } from "js-sha512";
 import { cookies } from "next/headers";
+import { categoryAccess, passwordAccess } from "./resourceAccess";
 
 const secretKey = process.env.SECRET_KEY
 
@@ -59,9 +60,26 @@ export function withPermission(handler) {
         const { searchParams } = new URL(request.url)
         const userId = parseInt(searchParams.get("id"))
 
-        if(session.user.id !== userId && session.user.role !== "Admin") {
+        if(
+            (session.user.id !== userId || !await accessResource(request, session)) && 
+            session.user.role !== "Admin"
+        ) {
             return Response.json({ "Unauthorized": "Not enough permission" }, { status: 403 })
         }
         return handler(request, session)
     }
+}
+
+async function accessResource(request, session)  {
+    const { searchParams } = new URL(request.url)
+    const categoryId = parseInt(searchParams.get("categoryId"))
+    const passwordId = parseInt(searchParams.get("passwordId"))
+
+    if(categoryId) {
+        return await categoryAccess(categoryId, session.user.id)
+    }
+    if(passwordId) {
+        return await passwordAccess(passwordId, session.user.id)
+    }
+    return true
 }
