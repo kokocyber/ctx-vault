@@ -3,10 +3,10 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import {
   Container,
+  Paper,
   List,
   ListItem,
   ListItemText,
-  Paper,
   Box,
   Button,
   Dialog,
@@ -16,18 +16,13 @@ import {
   DialogTitle,
   TextField,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
   Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { DataGrid } from "@mui/x-data-grid";
 import { UserContext } from "../(context)/UserContextComponent";
 import toast from "react-hot-toast";
 import {
@@ -46,6 +41,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { decryptText } from "@/middleware/encryption";
 import { sha512_256 } from "js-sha512";
 import { Navbar } from "../(components)/Navbar";
+import AutocompleteTextField from "../(components)/Autocomplete";
 
 const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 
@@ -59,7 +55,7 @@ const initialCategoriesData = {
 };
 
 const FullHeightContainer = styled(Container)({
-  height: "80vh",
+  height: "60vh",
   display: "flex",
   flexDirection: "row",
   paddingTop: "2%",
@@ -94,6 +90,8 @@ const TableBox = styled(Box)({
   width: "100%",
   display: "flex",
   flexDirection: "column",
+  backgroundColor: "white",
+  borderRadius: "25px 25px 25px 25px",
 });
 
 const ToolbarBox = styled(Box)({
@@ -103,7 +101,7 @@ const ToolbarBox = styled(Box)({
   alignItems: "center",
 });
 
-const TableRowHover = styled(TableRow)({
+const TableRowHover = styled(DataGrid)({
   "&:hover .action-buttons": {
     visibility: "visible",
   },
@@ -125,7 +123,6 @@ export default function Home() {
   useEffect(() => {
     if (currentUserData !== "" && currentUserData["user data"]) {
       setCategoriesData((prevData) => {
-        // Only update state if the data has actually changed
         if (
           JSON.stringify(prevData) !==
           JSON.stringify(currentUserData["user data"])
@@ -136,9 +133,6 @@ export default function Home() {
       });
       userId.current = currentUserData.id?.user.id;
     }
-    // } else {
-    //   router.push("/login");
-    // }
   }, [currentUserData, isUserLoggedIn, router]);
 
   const [categoriesData, setCategoriesData] = useState({});
@@ -159,6 +153,7 @@ export default function Home() {
   });
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingPassword, setEditingPassword] = useState(null);
+  const [rowSelectionModel, setRowSelectionModel] = useState([]);
 
   const setNewDPassword = (password) => {
     if (openEditPassword || openAddPassword) {
@@ -212,7 +207,7 @@ export default function Home() {
   };
 
   const handleAddPasswordOpen = () => {
-    setNewDPassword({"name": "", "username": "", "password": ""})
+    setNewDPassword({ name: "", username: "", password: "" });
     setOpenAddPassword(true);
   };
 
@@ -353,6 +348,88 @@ export default function Home() {
     toast.success("Copied password into Clipboard");
   };
 
+  const columns = [
+    {
+      field: "name",
+      headerName: "Name",
+      width: 200,
+    },
+    {
+      field: "username",
+      headerName: "Username",
+      width: 200,
+      renderCell: (params) => (
+        <Tooltip title="Copy Username" arrow>
+          <Button
+            style={{
+              justifyContent: "center",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              color: "black",
+            }}
+            onClick={() => handleUsernameCopy(params.value)}
+          >
+            {"••••••••••••••••"}
+          </Button>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "password",
+      headerName: "Password",
+      width: 200,
+      renderCell: (params) => (
+        <Tooltip title="Copy Password" arrow>
+          <Button
+            style={{
+              justifyContent: "center",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              color: "black",
+            }}
+            onClick={() => handlePasswordCopy(params.value)}
+          >
+            {"••••••••••••••••"}
+          </Button>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      sortable: false,
+      width: 100,
+      renderCell: (params) => (
+        <ActionButtons className="action-buttons">
+          <Tooltip title="Edit" arrow>
+            <IconButton onClick={() => handleEditPasswordOpen(params.row)}>
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete" arrow>
+            <IconButton onClick={() => handleDeletePassword(params.rowIndex)}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </ActionButtons>
+      ),
+    },
+  ];
+
+  const getRowDataByIds = (ids) => {
+    const selectedData = ids.map((id) =>
+      categoriesData[selectedCategory]?.passwords.find((row) => row.id === id)
+    );
+    return selectedData;
+  };
+
+  const handleSelectionChange = (newRowSelectionModel) => {
+    console.log("New Selection IDs:", newRowSelectionModel);
+    const selectedData = getRowDataByIds(newRowSelectionModel);
+    console.log("Selected Rows Data:", selectedData);
+    setRowSelectionModel(newRowSelectionModel);
+  };
+
   return (
     <>
       <Navbar />
@@ -368,37 +445,38 @@ export default function Home() {
             </Button>
           </Box>
           <CategoryList>
-            {Object.keys(categoriesData).map((key) => {
-              return (
-                <ListItemHover
-                  key={key}
-                  button
-                  selected={key === selectedCategory}
-                  onClick={() => handleCategoryClick(key)}
-                >
-                  <ListItemText primary={categoriesData[key].name} />
-                  <ActionButtons className="action-buttons">
-                    <Tooltip title="Edit" arrow>
-                      <IconButton onClick={() => handleEditCategoryOpen(key)}>
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete" arrow>
-                      <IconButton onClick={() => handleDeleteCategory(key)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </ActionButtons>
-                </ListItemHover>
-              );
-            })}
+            {Object.keys(categoriesData).map((key) => (
+              <ListItemHover
+                key={key}
+                button
+                selected={key === selectedCategory}
+                onClick={() => handleCategoryClick(key)}
+              >
+                <ListItemText primary={categoriesData[key].name} />
+                <ActionButtons className="action-buttons">
+                  <Tooltip title="Edit" arrow>
+                    <IconButton onClick={() => handleEditCategoryOpen(key)}>
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete" arrow>
+                    <IconButton onClick={() => handleDeleteCategory(key)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </ActionButtons>
+              </ListItemHover>
+            ))}
           </CategoryList>
         </FullHeightPaper>
         <Box style={{ flex: "1" }}>
           <TableBox>
             <ToolbarBox>
               <Typography className="vaultTitle" variant="h6">
-                {categoriesData[selectedCategory]?.name} Passwords
+                <span className="vaultTitleName">
+                  {categoriesData[selectedCategory]?.name}
+                </span>{" "}
+                Passwords
               </Typography>
               <Button
                 variant="contained"
@@ -408,140 +486,20 @@ export default function Home() {
                 Add Password
               </Button>
             </ToolbarBox>
-            <TableContainer
-              component={Paper}
-              style={{ flex: 1, maxWidth: "100%" }}
-            >
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      style={{
-                        width: "30%",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Name
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        maxWidth: "30%",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Username
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        maxWidth: "30%",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Password
-                    </TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {categoriesData[selectedCategory]?.passwords.length > 0 ? (
-                    categoriesData[selectedCategory]["passwords"].map(
-                      (row, index) => (
-                        <TableRowHover key={index}>
-                          <TableCell
-                            style={{
-                              maxWidth: "30%",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {row.name}
-                          </TableCell>
-                          <TableCell
-                            style={{
-                              maxWidth: "200px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            <Tooltip title="Copy Username" arrow>
-                              <Button
-                                style={{
-                                  justifyContent: "center",
-                                  overflow: "hidden",
-                                  whiteSpace: "nowrap",
-                                  color: "black",
-                                }}
-                                onClick={() => handleUsernameCopy(row.username)}
-                              >
-                                {"••••••••••••••••"}
-                              </Button>
-                            </Tooltip>
-                          </TableCell>
-                          <TableCell
-                            style={{
-                              maxWidth: "200px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            <Tooltip title="Copy Password" arrow>
-                              <Button
-                                style={{
-                                  justifyContent: "center",
-                                  overflow: "hidden",
-                                  whiteSpace: "nowrap",
-                                  color: "black",
-                                }}
-                                onClick={() => handlePasswordCopy(row.password)}
-                              >
-                                {"••••••••••••••••"}
-                              </Button>
-                            </Tooltip>
-                          </TableCell>
-                          <TableCell>
-                            <ActionButtons className="action-buttons">
-                              <Tooltip title="Edit" arrow>
-                                <IconButton
-                                  onClick={() => handleEditPasswordOpen(row)}
-                                >
-                                  <EditIcon />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Delete" arrow>
-                                <IconButton
-                                  onClick={() => handleDeletePassword(index)}
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </ActionButtons>
-                          </TableCell>
-                        </TableRowHover>
-                      )
-                    )
-                  ) : (
-                    <TableRowHover>
-                      <TableCell colSpan={4} align="center">
-                        No passwords found.
-                      </TableCell>
-                    </TableRowHover>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <DataGrid
+              rows={categoriesData[selectedCategory]?.passwords || []}
+              columns={columns}
+              autoHeight
+              checkboxSelection
+              onRowSelectionModelChange={handleSelectionChange}
+              rowSelectionModel={rowSelectionModel}
+              pageSizeOptions={[5, 10, 25]}
+            />
           </TableBox>
         </Box>
 
         {/* Dialogs */}
+        {/* Add Category Dialog */}
         <Dialog open={openAddCategory} onClose={handleAddCategoryClose}>
           <DialogTitle>Add New Category</DialogTitle>
           <DialogContent>
