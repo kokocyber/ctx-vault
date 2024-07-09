@@ -290,6 +290,7 @@ export default function Home() {
 
   const handleEditPassword = async () => {
     try {
+      console.log(editingPassword)
       const response = await updatePassword(
         userId.current,
         editingPassword.id,
@@ -308,14 +309,9 @@ export default function Home() {
 
   const handleDeletePassword = async (index) => {
     try {
-      console.log("index password", index);
-      console.log(
-        "with category data",
-        categoriesData[selectedCategory].passwords[index].id
-      );
       const response = await deletePassword(
         userId.current,
-        categoriesData[selectedCategory].passwords[index].id
+        rowSelectionModel[0]
       );
 
       const newUserData = await verifyCookie();
@@ -324,6 +320,7 @@ export default function Home() {
       toast.error("Failed deleting password");
       console.error(e);
     }
+    handleDeletePasswordClose()
   };
 
   const handleUpdateCategory = async () => {
@@ -748,7 +745,7 @@ export default function Home() {
             <Button onClick={handleDeletePasswordClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={deletePassword} color="primary">
+            <Button onClick={handleDeletePassword} color="primary">
               Delete
             </Button>
           </DialogActions>
