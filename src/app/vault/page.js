@@ -1,5 +1,6 @@
 "use client";
 
+import { alpha } from "@mui/material/styles";
 import { useEffect, useState, useContext, useRef } from "react";
 import {
   Container,
@@ -18,6 +19,7 @@ import {
   IconButton,
   Typography,
   Tooltip,
+  Toolbar,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import EditIcon from "@mui/icons-material/Edit";
@@ -42,6 +44,7 @@ import { decryptText } from "@/middleware/encryption";
 import { sha512_256 } from "js-sha512";
 import { Navbar } from "../(components)/Navbar";
 import AutocompleteTextField from "../(components)/Autocomplete";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 
@@ -55,11 +58,12 @@ const initialCategoriesData = {
 };
 
 const FullHeightContainer = styled(Container)({
-  height: "60vh",
+  height: "70vh",
   display: "flex",
   flexDirection: "row",
   paddingTop: "2%",
   maxWidth: "50%",
+  justifyContent: "center",
 });
 
 const FullHeightPaper = styled(Paper)({
@@ -145,6 +149,8 @@ export default function Home() {
   const [openEditCategory, setOpenEditCategory] = useState(false);
   const [openEditPassword, setOpenEditPassword] = useState(false);
 
+  const [openDeletePassword, setOpenDeletePassword] = useState(false);
+
   const [newCategory, setNewCategory] = useState("");
   const [newPassword, setNewPassword] = useState({
     name: "",
@@ -156,6 +162,7 @@ export default function Home() {
   const [rowSelectionModel, setRowSelectionModel] = useState([]);
 
   const setNewDPassword = (password) => {
+    console.log("password in setNewdPasswort function", password);
     if (openEditPassword || openAddPassword) {
       setNewPassword(password);
       return;
@@ -206,6 +213,14 @@ export default function Home() {
     setOpenAddCategory(false);
   };
 
+  const handleDeletePasswordOpen = () => {
+    setOpenDeletePassword(true);
+  };
+
+  const handleDeletePasswordClose = () => {
+    setOpenDeletePassword(false);
+  };
+
   const handleAddPasswordOpen = () => {
     setNewDPassword({ name: "", username: "", password: "" });
     setOpenAddPassword(true);
@@ -226,9 +241,11 @@ export default function Home() {
     setEditingCategory(null);
   };
 
-  const handleEditPasswordOpen = (password) => {
-    setEditingPassword(password);
-    setNewDPassword(password);
+  const handleEditPasswordOpen = () => {
+    const selectedData = getRowDataByIds(rowSelectionModel)[0];
+    console.log(selectedData);
+    setEditingPassword(selectedData);
+    setNewDPassword(selectedData);
     setOpenEditPassword(true);
   };
 
@@ -291,6 +308,11 @@ export default function Home() {
 
   const handleDeletePassword = async (index) => {
     try {
+      console.log("index password", index);
+      console.log(
+        "with category data",
+        categoriesData[selectedCategory].passwords[index].id
+      );
       const response = await deletePassword(
         userId.current,
         categoriesData[selectedCategory].passwords[index].id
@@ -352,12 +374,12 @@ export default function Home() {
     {
       field: "name",
       headerName: "Name",
-      width: 200,
+      width: 300,
     },
     {
       field: "username",
       headerName: "Username",
-      width: 200,
+      width: 300,
       renderCell: (params) => (
         <Tooltip title="Copy Username" arrow>
           <Button
@@ -377,7 +399,7 @@ export default function Home() {
     {
       field: "password",
       headerName: "Password",
-      width: 200,
+      width: 400,
       renderCell: (params) => (
         <Tooltip title="Copy Password" arrow>
           <Button
@@ -394,26 +416,27 @@ export default function Home() {
         </Tooltip>
       ),
     },
-    {
-      field: "actions",
-      headerName: "Actions",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <ActionButtons className="action-buttons">
-          <Tooltip title="Edit" arrow>
-            <IconButton onClick={() => handleEditPasswordOpen(params.row)}>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete" arrow>
-            <IconButton onClick={() => handleDeletePassword(params.rowIndex)}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </ActionButtons>
-      ),
-    },
+    // },
+    // {
+    //   field: "actions",
+    //   headerName: "Actions",
+    //   sortable: false,
+    //   width: 100,
+    //   renderCell: (params) => (
+    //     <ActionButtons className="action-buttons">
+    //       <Tooltip title="Edit" arrow>
+    //         <IconButton onClick={() => handleEditPasswordOpen(params.row)}>
+    //           <EditIcon />
+    //         </IconButton>
+    //       </Tooltip>
+    //       <Tooltip title="Delete" arrow>
+    //         <IconButton onClick={() => handleDeletePassword(params.rowIndex)}>
+    //           <DeleteIcon />
+    //         </IconButton>
+    //       </Tooltip>
+    //     </ActionButtons>
+    //   ),
+    // },
   ];
 
   const getRowDataByIds = (ids) => {
@@ -427,15 +450,74 @@ export default function Home() {
     console.log("New Selection IDs:", newRowSelectionModel);
     const selectedData = getRowDataByIds(newRowSelectionModel);
     console.log("Selected Rows Data:", selectedData);
+    console.log("Selected Row id:", newRowSelectionModel[0]);
     setRowSelectionModel(newRowSelectionModel);
   };
+
+  function EnhancedTableToolbar(props) {
+    const { numSelected } = props;
+
+    return (
+      <Toolbar
+        sx={{
+          pl: { sm: 2 },
+          pr: { xs: 1, sm: 1 },
+          ...(numSelected > 0 && {
+            bgcolor: (theme) =>
+              alpha(
+                theme.palette.primary.main,
+                theme.palette.action.activatedOpacity
+              ),
+          }),
+        }}
+      >
+        {numSelected > 0 ? (
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            color="inherit"
+            variant="subtitle1"
+            component="div"
+          >
+            {numSelected} selected
+          </Typography>
+        ) : (
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            variant="h6"
+            id="tableTitle"
+            component="div"
+          >
+            Actions
+          </Typography>
+        )}
+
+        {numSelected > 0 && (
+          <>
+            <Tooltip title="Edit">
+              <IconButton onClick={handleEditPasswordOpen}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton onClick={handleDeletePasswordOpen}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        )}
+      </Toolbar>
+    );
+  }
 
   return (
     <>
       <Navbar />
       <FullHeightContainer>
         <FullHeightPaper style={{ flex: "0 0 25%" }}>
-          <Box padding={2}>
+          <Box padding={2} textAlign="center">
+            <Typography className="vaultTitle" variant="h6">
+              Categories
+            </Typography>
             <Button
               variant="contained"
               color="primary"
@@ -486,6 +568,7 @@ export default function Home() {
                 Add Password
               </Button>
             </ToolbarBox>
+            <EnhancedTableToolbar numSelected={rowSelectionModel.length} />
             <DataGrid
               rows={categoriesData[selectedCategory]?.passwords || []}
               columns={columns}
@@ -494,6 +577,7 @@ export default function Home() {
               onRowSelectionModelChange={handleSelectionChange}
               rowSelectionModel={rowSelectionModel}
               pageSizeOptions={[5, 10, 25]}
+              disableMultipleRowSelection
             />
           </TableBox>
         </Box>
@@ -639,6 +723,33 @@ export default function Home() {
             </Button>
             <Button onClick={handleEditPassword} color="primary">
               Update
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Delete Password Dialog */}
+        <Dialog
+          open={openDeletePassword}
+          onClose={() => handleDeletePassword(rowSelectionModel[0])}
+        >
+          <DialogTitle>Delete Password</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to delete this password from {""}
+              <span className="vaultTitleName">
+                {categoriesData[selectedCategory]?.name}
+              </span>
+              ?
+              <br />
+              This operation is permanent.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeletePasswordClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={deletePassword} color="primary">
+              Delete
             </Button>
           </DialogActions>
         </Dialog>
