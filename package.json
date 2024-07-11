@@ -13,6 +13,8 @@
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.20",
     "@mui/material": "^5.15.20",
+    "@mui/x-data-grid": "^7.9.0",
+    "@mui/x-data-grid-generator": "^7.9.0",
     "@prisma/client": "^5.14.0",
     "crypto": "^1.0.1",
     "email-validator": "^2.0.4",

@@ -26,7 +26,7 @@ export function Navbar(props) {
   const lastName = useRef(")");
 
   useEffect(() => {
-/*
+    /*
     if (data) {
       firstName.current = data.id.user.firstName;
       sessionStorage.setItem("firstName", firstName);
@@ -41,13 +41,13 @@ export function Navbar(props) {
     let data = JSON.parse(sessionStorage.getItem("currentUserData"));
     setCurrentUserData(data);
 
-    if(isUserLoggedIn) {
-      if(currentUserData.length !== 0) {
-        firstName.current = currentUserData.id.user.firstName
-        lastName.current = currentUserData.id.user.lastName
+    if (isUserLoggedIn) {
+      if (currentUserData.length !== 0) {
+        firstName.current = currentUserData.id.user.firstName;
+        lastName.current = currentUserData.id.user.lastName;
       } else {
-        firstName.current = data.id.user.firstName
-        lastName.current = data.id.user.lastName
+        firstName.current = data.id.user.firstName;
+        lastName.current = data.id.user.lastName;
       }
     }
   }, [isUserLoggedIn]);
@@ -101,6 +101,7 @@ export function Navbar(props) {
               src={Logo}
               style={{ height: "20%", width: "20%", objectFit: "cover" }}
               alt="Logo"
+              draggable={false}
             />
           </Grid>
           <Grid item container xs={6}>
@@ -146,7 +147,9 @@ export function Navbar(props) {
                   <Avatar
                     className="accAvatar"
                     sx={{ width: 50, height: 50 }}
-                    {...stringAvatar(`${firstName.current} ${lastName.current}`)}
+                    {...stringAvatar(
+                      `${firstName.current} ${lastName.current}`
+                    )}
                   />
                 </IconButton>
               </Tooltip>

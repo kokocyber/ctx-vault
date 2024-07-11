@@ -1,34 +1,33 @@
-import { decrypt, encrypt, getSession } from "@/middleware/auth";
+import { getSession } from "@/middleware/auth";
 import { decryptText, encryptText } from "@/middleware/encryption";
 import { PrismaClient } from "@prisma/client";
 import { sha512_256 } from "js-sha512";
+import { withSession, withPermission } from "@/middleware/auth";
 
 const prisma = new PrismaClient();
 const secretKey = process.env.SECRET_KEY;
 
 // retrieve password by id
 async function getPassword(passwordId) {
-  const data = prisma.password.findFirst({
+  return await prisma.password.findFirst({
     where: {
       id: passwordId,
-    },
+    }
   });
-  return data;
 }
 
 // retrieve all passwords of category
 async function getPasswords(categoryId) {
-  const data = prisma.password.findMany({
+  return await prisma.password.findMany({
     where: {
       categoryId: categoryId,
-    },
+    }
   });
-  return data;
 }
 
 // create password for category
 async function createPassword(name, username, password, categoryId) {
-  const data = prisma.password.create({
+  return await prisma.password.create({
     data: {
       name: name,
       username: username,
@@ -40,22 +39,20 @@ async function createPassword(name, username, password, categoryId) {
       },
     },
   });
-  return data;
 }
 
 // delete password of category
 async function deletePassword(passwordId) {
-  const data = prisma.password.delete({
+  return await prisma.password.delete({
     where: {
       id: passwordId,
     },
   });
-  return data;
 }
 
 // edit password of category
 async function updatePassword(newPassword, newUsername, newName, passwordId) {
-  const data = prisma.password.update({
+  return await prisma.password.update({
     where: {
       id: passwordId,
     },
@@ -65,43 +62,29 @@ async function updatePassword(newPassword, newUsername, newName, passwordId) {
       password: newPassword,
     },
   });
-  return data;
 }
 
 // GET category passwords of user
-export async function GET(request) {
+export const GET = withSession(withPermission(async (request, session) => {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = parseInt(searchParams.get("id"));
-    const categoryId = parseInt(searchParams.get("categoryId"));
+    const { searchParams } = new URL(request.url)
+    const categoryId = parseInt(searchParams.get("categoryId"))
 
-    const session = await getSession();
-    if (!session) {
-      await prisma.$disconnect();
-      return Response.json({ Unauthorized: "Not logged in!" }, { status: 401 });
-    }
-    if (session.user.id !== userId && session.user.role !== "Admin") {
-      await prisma.$disconnect();
-      return Response.json(
-        { Unauthorized: "Not enough permission!" },
-        { status: 403 }
-      );
-    }
-    const data = await getPasswords(categoryId);
-    await prisma.$disconnect();
-    return Response.json({ passwords: data }, { status: 200 });
+    const data = await getPasswords(categoryId)
+    console.log(data)
+    return Response.json({ "passwords": data }, { status: 200 })
   } catch (e) {
-    prisma.$disconnect();
-    return Response.json({ error: e }, { status: 404 });
+    return Response.json({ "error": e.message }, { status: 404 })
+  } finally {
+    await prisma.$disconnect()
   }
-}
+}))
 
 // POST category password of user
-export async function POST(request) {
+export const POST = withSession(withPermission(async (request, session) => {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = parseInt(searchParams.get("id"));
-    const categoryId = parseInt(searchParams.get("categoryId"));
+    const { searchParams } = new URL(request.url)
+    const categoryId = parseInt(searchParams.get("categoryId"))
 
     const name = searchParams.get("name");
     const username = searchParams.get("username");
@@ -111,83 +94,45 @@ export async function POST(request) {
     const encryptedPassword = encryptText(password, encryptionKey);
     const encryptedUsername = encryptText(username, encryptionKey);
 
-    const session = await getSession();
-    if (!session) {
-      return Response.json({ Unauthorized: "Not logged in!" }, { status: 401 });
-    }
-    if (session.user.id !== userId && session.user.role !== "Admin") {
-      return Response.json(
-        { Unauthorized: "Not enough permission!" },
-        { status: 403 }
-      );
-    }
     const createdPassword = await createPassword(
       name,
       encryptedUsername,
       encryptedPassword,
       categoryId
-    );
-    await prisma.$disconnect();
-    return Response.json(
-      { "Created Password": createdPassword },
-      { status: 201 }
-    );
+    )
+
+    return Response.json({ "Created Password": createdPassword }, { status: 201 })
   } catch (e) {
-    prisma.$disconnect();
-    return Response.json({ error: e }, { status: 404 });
+    return Response.json({ "error": e.message }, { status: 404 })
+  } finally {
+    await prisma.$disconnect()
   }
-}
+}))
 
 // DELETE password of category
-export async function DELETE(request) {
+export const DELETE = withSession(withPermission(async (request, session) => {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = parseInt(searchParams.get("id"));
-    const passwordId = parseInt(searchParams.get("passwordId"));
+    const { searchParams } = new URL(request.url)
+    const passwordId = parseInt(searchParams.get("passwordId"))
 
-    const session = await getSession();
-    if (!session) {
-      await prisma.$disconnect();
-      return Response.json({ Unauthorized: "Not logged in!" }, { status: 401 });
-    }
-    if (session.user.id !== userId && session.user.role !== "Admin") {
-      await prisma.$disconnect();
-      return Response.json(
-        { Unauthorized: "Not enough permission!" },
-        { status: 403 }
-      );
-    }
-    const deletedPassword = deletePassword(passwordId);
-    await prisma.$disconnect();
-    return Response.json({ "deleted user": deletedPassword }, { status: 200 });
+    const deletedPassword = deletePassword(passwordId)
+    return Response.json({ "deleted password": deletedPassword }, { status: 200 })
   } catch (e) {
-    await prisma.$disconnect();
-    return Response.json({ error: e }, { status: 404 });
+    return Response.json({ "error": e.message }, { status: 404 })
+  } finally {
+    await prisma.$disconnect()
   }
-}
+}))
 
 // PUT password of category
-export async function PUT(request) {
+export const PUT = withSession(withPermission(async (request, session) => {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url)
+    const passwordId = parseInt(searchParams.get("passwordId"))
 
-    const userId = parseInt(searchParams.get("id"));
-    const passwordId = parseInt(searchParams.get("passwordId"));
-
-    var newName = searchParams.get("name");
-    var newUsername = searchParams.get("username");
-    var newPassword = searchParams.get("password");
-
-    const session = await getSession();
-    if (!session) {
-      return Response.json({ Unauthorized: "Not logged in!" }, { status: 401 });
-    }
-    if (session.user.id !== userId && session.user.role !== "Admin") {
-      return Response.json(
-        { Unauthorized: "Not enough permission!" },
-        { status: 403 }
-      );
-    }
+    var newName = searchParams.get("name")
+    var newUsername = searchParams.get("username")
+    var newPassword = searchParams.get("password")
 
     const encryptionKey = sha512_256(secretKey);
     const currentPassword = await getPassword(passwordId);
@@ -209,10 +154,10 @@ export async function PUT(request) {
       newName,
       passwordId
     );
-    await prisma.$disconnect();
-    return Response.json({ "deleted user": updatePassword }, { status: 200 });
+    return Response.json({ "updated password": updatedPassword })
   } catch (e) {
-    await prisma.$disconnect();
-    return Response.json({ error: e }, { status: 404 });
+    return Response.json({ "error": e.message }, { status: 404 })
+  } finally {
+    await prisma.$disconnect()
   }
-}
+}))

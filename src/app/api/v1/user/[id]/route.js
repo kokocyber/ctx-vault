@@ -6,17 +6,34 @@ const prisma = new PrismaClient();
 
 // deletes user
 async function deleteUser(userId) {
-    const data = await prisma.user.delete({
+    const categories = await prisma.category.findMany({
+        where: {
+            userId: userId
+        }
+    })
+    for(const category of categories) {
+        await prisma.password.deleteMany({
+            where: {
+                categoryId: category.id
+            }
+        })
+    }
+
+    await prisma.category.deleteMany({
+        where: {
+            userId: userId
+        }
+    })
+    return await prisma.user.delete({
         where: {
             id: userId,
         }
     })
-    return data
 }
 
 // updates user
 async function updateUser(userId, newPassword, newFirstName, newLastName) {
-    const data = await prisma.user.update({
+    return await prisma.user.update({
         where: {
             id: userId
         },
@@ -26,17 +43,15 @@ async function updateUser(userId, newPassword, newFirstName, newLastName) {
             password: newPassword
         }
     })
-    return data;
 }
 
 // retrieves user
 async function getUser(userId) {
-    const data = await prisma.user.findUniqueOrThrow({
+    return await prisma.user.findUniqueOrThrow({
         where: {
             id: userId,
         }
     })
-    return data
 }
 
 // DELETE request
@@ -52,12 +67,12 @@ export async function DELETE(request, { params }) {
             return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
         }
         const deletedUser = await deleteUser(userId)
-        await prisma.$disconnect()
         return Response.json({"Deleted User": deletedUser}, {status: 200})
 
     } catch(e) {
+        return Response.json({"Error": e.message}, {status: 404})
+    } finally {
         await prisma.$disconnect()
-        return Response.json({"Error": e}, {status: 404})
     }
 }
 
@@ -65,7 +80,6 @@ export async function DELETE(request, { params }) {
 export async function PUT(request, { params }) {
     try {
         const { searchParams } = new URL(request.url)
-        console.log(params.id)
         const userId = parseInt(params.id)
 
         var newPassword = searchParams.get("password")
@@ -76,7 +90,6 @@ export async function PUT(request, { params }) {
         if(!session) {
             return Response.json({"Unauthorized": "Not logged in!"}, {status: 401})
         }
-        console.log(session.user.id, userId)
         if(session.user.id !== userId && session.user.role !== "Admin") {
             return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
         }
@@ -109,12 +122,12 @@ export async function PUT(request, { params }) {
         }
 
         const updatedUser = await updateUser(userId, newPassword, newFirstName, newLastName)
-        await prisma.$disconnect()
-        return Response.json({"Updated User": updateUser}, {status: 200})
+        return Response.json({"Updated User": updatedUser}, {status: 200})
 
     } catch(e) {
+        return Response.json({"Error": e.message}, {status: 404})
+    } finally {
         await prisma.$disconnect()
-        return Response.json({"Error": e}, {status: 404})
     }
 }
 
@@ -131,11 +144,11 @@ export async function GET(request, { params }) {
             return Response.json({"Unauthorized": "Not enough permissions!"}, {status: 403})
         }
         const user = await getUser(userId)
-        await prisma.$disconnect()
         return Response.json({"user": user}, {status: 200})
 
     } catch(e) {
-        await prisma.$disconnect()
         return Response.json({"Error": e}, {status: 404})
+    } finally {
+        await prisma.$disconnect()
     }
 }

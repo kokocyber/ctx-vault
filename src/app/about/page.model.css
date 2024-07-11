@@ -6,3 +6,7 @@
 .shape {
     clip-path: circle(42% at 50% 50%);
 }
+
+.noDecoration {
+    text-decoration: none;
+}

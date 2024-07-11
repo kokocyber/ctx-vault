@@ -1,12 +1,13 @@
 "use client";
 
+import { alpha } from "@mui/material/styles";
 import { useEffect, useState, useContext, useRef } from "react";
 import {
   Container,
+  Paper,
   List,
   ListItem,
   ListItemText,
-  Paper,
   Box,
   Button,
   Dialog,
@@ -16,18 +17,14 @@ import {
   DialogTitle,
   TextField,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
   Tooltip,
+  Toolbar,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { DataGrid } from "@mui/x-data-grid";
 import { UserContext } from "../(context)/UserContextComponent";
 import toast from "react-hot-toast";
 import {
@@ -42,11 +39,14 @@ import {
 } from "../(util)/api";
 import "./page.model.css";
 import { useRouter } from "next/navigation";
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { decryptText } from "@/middleware/encryption";
 import { sha512_256 } from "js-sha512";
+import { Navbar } from "../(components)/Navbar";
+import AutocompleteTextField from "../(components)/Autocomplete";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
-const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY
+const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 
 const initialCategoriesData = {
   1: {
@@ -58,11 +58,12 @@ const initialCategoriesData = {
 };
 
 const FullHeightContainer = styled(Container)({
-  height: "90vh",
+  height: "70vh",
   display: "flex",
   flexDirection: "row",
   paddingTop: "2%",
   maxWidth: "50%",
+  justifyContent: "center",
 });
 
 const FullHeightPaper = styled(Paper)({
@@ -93,6 +94,8 @@ const TableBox = styled(Box)({
   width: "100%",
   display: "flex",
   flexDirection: "column",
+  backgroundColor: "white",
+  borderRadius: "25px 25px 25px 25px",
 });
 
 const ToolbarBox = styled(Box)({
@@ -102,7 +105,7 @@ const ToolbarBox = styled(Box)({
   alignItems: "center",
 });
 
-const TableRowHover = styled(TableRow)({
+const TableRowHover = styled(DataGrid)({
   "&:hover .action-buttons": {
     visibility: "visible",
   },
@@ -124,7 +127,6 @@ export default function Home() {
   useEffect(() => {
     if (currentUserData !== "" && currentUserData["user data"]) {
       setCategoriesData((prevData) => {
-        // Only update state if the data has actually changed
         if (
           JSON.stringify(prevData) !==
           JSON.stringify(currentUserData["user data"])
@@ -135,9 +137,6 @@ export default function Home() {
       });
       userId.current = currentUserData.id?.user.id;
     }
-    // } else {
-    //   router.push("/login");
-    // }
   }, [currentUserData, isUserLoggedIn, router]);
 
   const [categoriesData, setCategoriesData] = useState({});
@@ -150,6 +149,8 @@ export default function Home() {
   const [openEditCategory, setOpenEditCategory] = useState(false);
   const [openEditPassword, setOpenEditPassword] = useState(false);
 
+  const [openDeletePassword, setOpenDeletePassword] = useState(false);
+
   const [newCategory, setNewCategory] = useState("");
   const [newPassword, setNewPassword] = useState({
     name: "",
@@ -158,45 +159,53 @@ export default function Home() {
   });
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingPassword, setEditingPassword] = useState(null);
+  const [rowSelectionModel, setRowSelectionModel] = useState([]);
 
   const setNewDPassword = (password) => {
-    if(openEditPassword || openAddPassword) {
-      setNewPassword(password)
-      return
+    console.log("password in setNewdPasswort function", password);
+    if (openEditPassword || openAddPassword) {
+      setNewPassword(password);
+      return;
     }
 
-    var newDPassword = {"name": "", "username": "", "password": ""}
-    if(password.name !== "") {
-      newDPassword.name = password.name
+    var newDPassword = { name: "", username: "", password: "" };
+    if (password.name !== "") {
+      newDPassword.name = password.name;
     }
-    if(password.username !== "") {
-      newDPassword.username = decryptText(password.username, sha512_256(secretKey))
+    if (password.username !== "") {
+      newDPassword.username = decryptText(
+        password.username,
+        sha512_256(secretKey)
+      );
     }
-    if(password.password !== "") {
-      newDPassword.password = decryptText(password.password, sha512_256(secretKey))
+    if (password.password !== "") {
+      newDPassword.password = decryptText(
+        password.password,
+        sha512_256(secretKey)
+      );
     }
-    setNewPassword(newDPassword)
-  }
+    setNewPassword(newDPassword);
+  };
 
   const setNewOCategory = (category) => {
-    if(openEditCategory || openAddCategory) {
-      setNewCategory(category)
-      return
+    if (openEditCategory || openAddCategory) {
+      setNewCategory(category);
+      return;
     }
 
-    var newOCateogry = ""
-    if(category !== "") {
-      newOCateogry = categoriesData[category].name
+    var newOCateogry = "";
+    if (category !== "") {
+      newOCateogry = categoriesData[category].name;
     }
-    setNewCategory(newOCateogry)
-  }
+    setNewCategory(newOCateogry);
+  };
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
   };
 
   const handleAddCategoryOpen = () => {
-    setNewOCategory("")
+    setNewOCategory("");
     setOpenAddCategory(true);
   };
 
@@ -204,7 +213,16 @@ export default function Home() {
     setOpenAddCategory(false);
   };
 
+  const handleDeletePasswordOpen = () => {
+    setOpenDeletePassword(true);
+  };
+
+  const handleDeletePasswordClose = () => {
+    setOpenDeletePassword(false);
+  };
+
   const handleAddPasswordOpen = () => {
+    setNewDPassword({ name: "", username: "", password: "" });
     setOpenAddPassword(true);
   };
 
@@ -223,9 +241,11 @@ export default function Home() {
     setEditingCategory(null);
   };
 
-  const handleEditPasswordOpen = (password) => {
-    setEditingPassword(password);
-    setNewDPassword(password);
+  const handleEditPasswordOpen = () => {
+    const selectedData = getRowDataByIds(rowSelectionModel)[0];
+    console.log(selectedData);
+    setEditingPassword(selectedData);
+    setNewDPassword(selectedData);
     setOpenEditPassword(true);
   };
 
@@ -270,6 +290,7 @@ export default function Home() {
 
   const handleEditPassword = async () => {
     try {
+      console.log(editingPassword)
       const response = await updatePassword(
         userId.current,
         editingPassword.id,
@@ -290,7 +311,7 @@ export default function Home() {
     try {
       const response = await deletePassword(
         userId.current,
-        categoriesData[selectedCategory].passwords[index].id
+        rowSelectionModel[0]
       );
 
       const newUserData = await verifyCookie();
@@ -299,6 +320,7 @@ export default function Home() {
       toast.error("Failed deleting password");
       console.error(e);
     }
+    handleDeletePasswordClose()
   };
 
   const handleUpdateCategory = async () => {
@@ -319,8 +341,8 @@ export default function Home() {
   };
 
   const handleDeleteCategory = async (category) => {
-    console.log(selectedCategory)
-    console.log(categoriesData)
+    console.log(selectedCategory);
+    console.log(categoriesData);
     try {
       const response = await deleteCategory(
         categoriesData[category].id,
@@ -336,30 +358,173 @@ export default function Home() {
   };
 
   const handleUsernameCopy = (username) => {
-    navigator.clipboard.writeText(decryptText(username, sha512_256(secretKey)))
-    toast.success("Copied username into Clipboard")
-  }
+    navigator.clipboard.writeText(decryptText(username, sha512_256(secretKey)));
+    toast.success("Copied username into Clipboard");
+  };
 
   const handlePasswordCopy = (password) => {
-    navigator.clipboard.writeText(decryptText(password, sha512_256(secretKey)))
-    toast.success("Copied password into Clipboard")
+    navigator.clipboard.writeText(decryptText(password, sha512_256(secretKey)));
+    toast.success("Copied password into Clipboard");
+  };
+
+  const columns = [
+    {
+      field: "name",
+      headerName: "Name",
+      width: 300,
+    },
+    {
+      field: "username",
+      headerName: "Username",
+      width: 300,
+      renderCell: (params) => (
+        <Tooltip title="Copy Username" arrow>
+          <Button
+            style={{
+              justifyContent: "center",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              color: "black",
+            }}
+            onClick={() => handleUsernameCopy(params.value)}
+          >
+            {"••••••••••••••••"}
+          </Button>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "password",
+      headerName: "Password",
+      width: 400,
+      renderCell: (params) => (
+        <Tooltip title="Copy Password" arrow>
+          <Button
+            style={{
+              justifyContent: "center",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              color: "black",
+            }}
+            onClick={() => handlePasswordCopy(params.value)}
+          >
+            {"••••••••••••••••"}
+          </Button>
+        </Tooltip>
+      ),
+    },
+    // },
+    // {
+    //   field: "actions",
+    //   headerName: "Actions",
+    //   sortable: false,
+    //   width: 100,
+    //   renderCell: (params) => (
+    //     <ActionButtons className="action-buttons">
+    //       <Tooltip title="Edit" arrow>
+    //         <IconButton onClick={() => handleEditPasswordOpen(params.row)}>
+    //           <EditIcon />
+    //         </IconButton>
+    //       </Tooltip>
+    //       <Tooltip title="Delete" arrow>
+    //         <IconButton onClick={() => handleDeletePassword(params.rowIndex)}>
+    //           <DeleteIcon />
+    //         </IconButton>
+    //       </Tooltip>
+    //     </ActionButtons>
+    //   ),
+    // },
+  ];
+
+  const getRowDataByIds = (ids) => {
+    const selectedData = ids.map((id) =>
+      categoriesData[selectedCategory]?.passwords.find((row) => row.id === id)
+    );
+    return selectedData;
+  };
+
+  const handleSelectionChange = (newRowSelectionModel) => {
+    console.log("New Selection IDs:", newRowSelectionModel);
+    const selectedData = getRowDataByIds(newRowSelectionModel);
+    console.log("Selected Rows Data:", selectedData);
+    console.log("Selected Row id:", newRowSelectionModel[0]);
+    setRowSelectionModel(newRowSelectionModel);
+  };
+
+  function EnhancedTableToolbar(props) {
+    const { numSelected } = props;
+
+    return (
+      <Toolbar
+        sx={{
+          pl: { sm: 2 },
+          pr: { xs: 1, sm: 1 },
+          ...(numSelected > 0 && {
+            bgcolor: (theme) =>
+              alpha(
+                theme.palette.primary.main,
+                theme.palette.action.activatedOpacity
+              ),
+          }),
+        }}
+      >
+        {numSelected > 0 ? (
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            color="inherit"
+            variant="subtitle1"
+            component="div"
+          >
+            {numSelected} selected
+          </Typography>
+        ) : (
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            variant="h6"
+            id="tableTitle"
+            component="div"
+          >
+            Actions
+          </Typography>
+        )}
+
+        {numSelected > 0 && (
+          <>
+            <Tooltip title="Edit">
+              <IconButton onClick={handleEditPasswordOpen}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton onClick={handleDeletePasswordOpen}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        )}
+      </Toolbar>
+    );
   }
 
   return (
-    <FullHeightContainer>
-      <FullHeightPaper style={{ flex: "0 0 25%" }}>
-        <Box padding={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddCategoryOpen}
-          >
-            Add Category
-          </Button>
-        </Box>
-        <CategoryList>
-          {Object.keys(categoriesData).map((key) => {
-            return (
+    <>
+      <Navbar />
+      <FullHeightContainer>
+        <FullHeightPaper style={{ flex: "0 0 25%" }}>
+          <Box padding={2} textAlign="center">
+            <Typography className="vaultTitle" variant="h6">
+              Categories
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddCategoryOpen}
+            >
+              Add Category
+            </Button>
+          </Box>
+          <CategoryList>
+            {Object.keys(categoriesData).map((key) => (
               <ListItemHover
                 key={key}
                 button
@@ -380,302 +545,212 @@ export default function Home() {
                   </Tooltip>
                 </ActionButtons>
               </ListItemHover>
-            );
-          })}
-        </CategoryList>
-      </FullHeightPaper>
-      <Box style={{ flex: "1" }}>
-        <TableBox>
-          <ToolbarBox>
-            <Typography className="vaultTitle" variant="h6">
-              {categoriesData[selectedCategory]?.name} Passwords
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddPasswordOpen}
-            >
-              Add Password
+            ))}
+          </CategoryList>
+        </FullHeightPaper>
+        <Box style={{ flex: "1" }}>
+          <TableBox>
+            <ToolbarBox>
+              <Typography className="vaultTitle" variant="h6">
+                <span className="vaultTitleName">
+                  {categoriesData[selectedCategory]?.name}
+                </span>{" "}
+                Passwords
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleAddPasswordOpen}
+              >
+                Add Password
+              </Button>
+            </ToolbarBox>
+            <EnhancedTableToolbar numSelected={rowSelectionModel.length} />
+            <DataGrid
+              rows={categoriesData[selectedCategory]?.passwords || []}
+              columns={columns}
+              autoHeight
+              checkboxSelection
+              onRowSelectionModelChange={handleSelectionChange}
+              rowSelectionModel={rowSelectionModel}
+              pageSizeOptions={[5, 10, 25]}
+              disableMultipleRowSelection
+            />
+          </TableBox>
+        </Box>
+
+        {/* Dialogs */}
+        {/* Add Category Dialog */}
+        <Dialog open={openAddCategory} onClose={handleAddCategoryClose}>
+          <DialogTitle>Add New Category</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please enter the name of the new category.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Category Name"
+              fullWidth
+              value={newCategory}
+              onChange={(e) => setNewOCategory(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleAddCategoryClose} color="primary">
+              Cancel
             </Button>
-          </ToolbarBox>
-          <TableContainer
-            component={Paper}
-            style={{ flex: 1, maxWidth: "100%" }}
-          >
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell
-                    style={{
-                      width: "150px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Name
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      maxWidth: "200px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Username
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      maxWidth: "200px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Password
-                  </TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {categoriesData[selectedCategory]?.passwords.length > 0 ? (
-                  categoriesData[selectedCategory]["passwords"].map(
-                    (row, index) => (
-                      <TableRowHover key={index}>
-                        <TableCell
-                          style={{
-                            maxWidth: "200px",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {row.name}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            maxWidth: "200px",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          <Tooltip title="Copy Username" arrow>
-                            <Button
-                              style={{
-                                width: "150px",
-                                justifyContent: "center",
-                                overflow: "hidden",
-                                whiteSpace: "nowrap",
-                                color: "black"
-                              }}
-                              onClick={() => handleUsernameCopy(row.username)}
-                            >
-                              {"••••••••••••••••"}
-                            </Button>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            maxWidth: "200px",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          <Tooltip title="Copy Password" arrow>
-                            <Button
-                              style={{
-                                width: "150px",
-                                justifyContent: "center",
-                                overflow: "hidden",
-                                whiteSpace: "nowrap",
-                                color: "black"
-                              }}
-                              onClick={() => handlePasswordCopy(row.password)}
-                            >
-                              {"••••••••••••••••"}
-                            </Button>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
-                          <ActionButtons className="action-buttons">
-                            <Tooltip title="Edit" arrow>
-                              <IconButton
-                                onClick={() => handleEditPasswordOpen(row)}
-                              >
-                                <EditIcon />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Delete" arrow>
-                              <IconButton
-                                onClick={() => handleDeletePassword(index)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </ActionButtons>
-                        </TableCell>
-                      </TableRowHover>
-                    )
-                  )
-                ) : (
-                  <TableRowHover>
-                    <TableCell colSpan={4} align="center">
-                      No passwords found.
-                    </TableCell>
-                  </TableRowHover>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </TableBox>
-      </Box>
+            <Button onClick={handleAddCategory} color="primary">
+              Add
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      {/* Dialogs */}
-      <Dialog open={openAddCategory} onClose={handleAddCategoryClose}>
-        <DialogTitle>Add New Category</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please enter the name of the new category.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Category Name"
-            fullWidth
-            value={newCategory}
-            onChange={(e) => setNewOCategory(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleAddCategoryClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleAddCategory} color="primary">
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {/* Edit Category Dialog */}
+        <Dialog open={openEditCategory} onClose={handleEditCategoryClose}>
+          <DialogTitle>Edit Category</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please enter the new name for the category.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Category Name"
+              fullWidth
+              value={newCategory}
+              onChange={(e) => setNewOCategory(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleEditCategoryClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateCategory} color="primary">
+              Update
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      {/* Edit Category Dialog */}
-      <Dialog open={openEditCategory} onClose={handleEditCategoryClose}>
-        <DialogTitle>Edit Category</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please enter the new name for the category.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Category Name"
-            fullWidth
-            value={newCategory}
-            onChange={(e) => setNewOCategory(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleEditCategoryClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleUpdateCategory} color="primary">
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {/* Add Password Dialog */}
+        <Dialog open={openAddPassword} onClose={handleAddPasswordClose}>
+          <DialogTitle>Add New Password</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please enter the details of the new password.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Name"
+              fullWidth
+              value={newPassword.name}
+              onChange={(e) =>
+                setNewDPassword({ ...newPassword, name: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Username"
+              fullWidth
+              value={newPassword.username}
+              onChange={(e) =>
+                setNewDPassword({ ...newPassword, username: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Password"
+              fullWidth
+              value={newPassword.password}
+              onChange={(e) =>
+                setNewDPassword({ ...newPassword, password: e.target.value })
+              }
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleAddPasswordClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleAddPassword} color="primary">
+              Add
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      {/* Add Password Dialog */}
-      <Dialog open={openAddPassword} onClose={handleAddPasswordClose}>
-        <DialogTitle>Add New Password</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please enter the details of the new password.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Name"
-            fullWidth
-            value={newPassword.name}
-            onChange={(e) =>
-              setNewDPassword({ ...newPassword, name: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Username"
-            fullWidth
-            value={newPassword.username}
-            onChange={(e) =>
-              setNewDPassword({ ...newPassword, username: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Password"
-            fullWidth
-            value={newPassword.password}
-            onChange={(e) =>
-              setNewDPassword({ ...newPassword, password: e.target.value })
-            }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleAddPasswordClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleAddPassword} color="primary">
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {/* Edit Password Dialog */}
+        <Dialog open={openEditPassword} onClose={handleEditPasswordClose}>
+          <DialogTitle>Edit Password</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please enter the new details for the password.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Name"
+              fullWidth
+              value={newPassword.name}
+              onChange={(e) =>
+                setNewDPassword({ ...newPassword, name: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Username"
+              fullWidth
+              value={newPassword.username}
+              onChange={(e) =>
+                setNewDPassword({ ...newPassword, username: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Password"
+              fullWidth
+              value={newPassword.password}
+              onChange={(e) =>
+                setNewDPassword({ ...newPassword, password: e.target.value })
+              }
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleEditPasswordClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleEditPassword} color="primary">
+              Update
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      {/* Edit Password Dialog */}
-      <Dialog open={openEditPassword} onClose={handleEditPasswordClose}>
-        <DialogTitle>Edit Password</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please enter the new details for the password.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Name"
-            fullWidth
-            value={newPassword.name}
-            onChange={(e) =>
-              setNewDPassword({ ...newPassword, name: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Username"
-            fullWidth
-            value={newPassword.username}
-            onChange={(e) =>
-              setNewDPassword({ ...newPassword, username: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Password"
-            fullWidth
-            value={newPassword.password}
-            onChange={(e) =>
-              setNewDPassword({ ...newPassword, password: e.target.value })
-            }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleEditPasswordClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleEditPassword} color="primary">
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </FullHeightContainer>
+        {/* Delete Password Dialog */}
+        <Dialog
+          open={openDeletePassword}
+          onClose={() => handleDeletePassword(rowSelectionModel[0])}
+        >
+          <DialogTitle>Delete Password</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to delete this password from {""}
+              <span className="vaultTitleName">
+                {categoriesData[selectedCategory]?.name}
+              </span>
+              ?
+              <br />
+              This operation is permanent.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeletePasswordClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleDeletePassword} color="primary">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </FullHeightContainer>
+    </>
   );
 }

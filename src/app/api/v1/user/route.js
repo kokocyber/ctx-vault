@@ -1,4 +1,4 @@
-import { getSession, securePassword } from "@/middleware/auth";
+import { getSession, securePassword, withPermission, withSession } from "@/middleware/auth";
 import { PrismaClient } from "@prisma/client";
 import * as EmailValidator from "email-validator";
 import { passwordSchema, nameSchema } from "@/app/(util)/validator";
@@ -7,17 +7,12 @@ const prisma = new PrismaClient();
 
 // retrieves all users
 async function getAllUsers() {
-  const data = await prisma.user.findMany();
-
-  if (data.length === 0) {
-    data.push("no users");
-  }
-  return data;
+  return await prisma.user.findMany();
 }
 
 // adds user
 async function addUser(email, password, firstName, lastName) {
-  const user = await prisma.user.create({
+  return await prisma.user.create({
     data: {
       email: email,
       firstName: firstName,
@@ -25,31 +20,18 @@ async function addUser(email, password, firstName, lastName) {
       password: password,
     },
   });
-  return user;
 }
 
-// GET request
-export async function GET(request) {
+export const GET = withSession(withPermission(async (request, session) => {
   try {
-    const session = await getSession();
-    if (!session) {
-      return Response.json({ Unauthorized: "Not logged in!" }, { status: 401 });
-    }
-    if (session.user.role !== "Admin") {
-      return Response.json(
-        { Unauthorized: "Not enough permissions!" },
-        { status: 403 }
-      );
-    }
-
-    const data = await getAllUsers();
-    await prisma.$disconnect();
-    return Response.json({ users: data }, { status: 200 });
-  } catch (e) {
-    await prisma.$disconnect();
-    return Response.json({ error: e }, { status: 400 });
+    const users = await getAllUsers()
+    return Response.json({ "users": users }, { status: 200 })
+  } catch(e) {
+    return Response.json({ "error": e.message }, { status: 404 })
+  } finally {
+    await prisma.$disconnect()
   }
-}
+}))
 
 // POST request
 export async function POST(request) {
@@ -85,7 +67,8 @@ export async function POST(request) {
       { status: 201 }
     );
   } catch (e) {
-    await prisma.$disconnect();
-    return Response.json({ error: e, status: 400 }, { status: 400 });
+    return Response.json({ error: e.message, status: 400 }, { status: 400 });
+  } finally {
+    await prisma.$disconnect()
   }
 }

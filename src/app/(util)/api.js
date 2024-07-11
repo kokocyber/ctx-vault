@@ -48,9 +48,12 @@ export async function fetchCurrentUserData() {
 // create Category for user
 export async function createCategory(userId, name) {
   try {
-    const response = await fetch(`/api/v1/categories?id=${userId}&categoryName=${name}`, {
-      method: "POST",
-    });
+    const response = await fetch(
+      `/api/v1/categories?id=${userId}&categoryName=${name}`,
+      {
+        method: "POST",
+      }
+    );
     const contentType = response.headers.get("content-type");
 
     if (
@@ -99,7 +102,6 @@ export async function updateCategory(categoryId, userId, name) {
     throw error;
   }
 }
-
 
 // deletes category for user
 export async function deleteCategory(categoryId, userId) {
@@ -237,9 +239,12 @@ export async function logout() {
 // create password for category
 export async function createPassword(id, categoryId, name, username, password) {
   try {
-    const response = await fetch(`/api/v1/password?id=${id}&categoryId=${categoryId}&name=${name}&username=${username}&password=${password}`, {
-      method: "POST",
-    });
+    const response = await fetch(
+      `/api/v1/password?id=${id}&categoryId=${categoryId}&name=${name}&username=${username}&password=${password}`,
+      {
+        method: "POST",
+      }
+    );
     const contentType = response.headers.get("content-type");
 
     if (
@@ -261,9 +266,12 @@ export async function createPassword(id, categoryId, name, username, password) {
 // delete password for category
 export async function deletePassword(id, passwordId) {
   try {
-    const response = await fetch(`/api/v1/password?id=${id}&passwordId=${passwordId}`, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      `/api/v1/password?id=${id}&passwordId=${passwordId}`,
+      {
+        method: "DELETE",
+      }
+    );
     const contentType = response.headers.get("content-type");
 
     if (
@@ -285,9 +293,12 @@ export async function deletePassword(id, passwordId) {
 // change password for category
 export async function updatePassword(id, passwordId, name, username, password) {
   try {
-    const response = await fetch(`/api/v1/password?id=${id}&passwordId=${passwordId}&name=${name}&username=${username}&password=${password}`, {
-      method: "PUT",
-    });
+    const response = await fetch(
+      `/api/v1/password?id=${id}&passwordId=${passwordId}&name=${name}&username=${username}&password=${password}`,
+      {
+        method: "PUT",
+      }
+    );
     const contentType = response.headers.get("content-type");
 
     if (
@@ -309,9 +320,12 @@ export async function updatePassword(id, passwordId, name, username, password) {
 // change user data
 export async function updateUser(id, firstName, lastName, password) {
   try {
-    const response = await fetch(`/api/v1/user/${id}?firstName=${firstName}&lastName=${lastName}&password=${password}`, {
-      method: "PUT",
-    });
+    const response = await fetch(
+      `/api/v1/user/${id}?firstName=${firstName}&lastName=${lastName}&password=${password}`,
+      {
+        method: "PUT",
+      }
+    );
     const contentType = response.headers.get("content-type");
 
     if (

@@ -36,7 +36,7 @@ export default function Home() {
     <>
       <BrowserTab title="Equinox - Home" />
       <Navbar />
-      <Grid container justifyContent="left" paddingTop={10} paddingLeft={10}>
+      <Grid container justifyContent="left" paddingTop={15} paddingLeft={10}>
         <Grid item xs={12}>
           <h1 className="homepageTitle">
             <span className="highlight">Guarding</span> Your Digital Fortress,{" "}
