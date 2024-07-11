@@ -40,6 +40,14 @@ npx prisma generate
 npx prisma migrate dev --name init
 ```
 
+Erstelle einen .env.local im root und definiere folgende Variablen:
+
+```
+SECRET_KEY="SECRET_KEY"
+NEXT_PUBLIC_SECRET_KEY="SECRET_KEY"
+DATABASE_URL="postgresql://postgres:testPassword@localhost:5432/vault?schema=public"
+```
+
 Starte die Applikation
 
 ```sh
@@ -371,6 +379,9 @@ export const DELETE = withSession(withPermission(async (request, session) => {
 ```
 
 Die Funktion `deletePassword(passwordId)` führt eine Datenbankoperation durch, die einen Eintrag löscht. Das ist ein klarer Fall von mutable state, da es den Zustand der Datenbank verändert. Die Funktion selbst verändert keine ihrer Eingaben direkt, aber sie interagiert mit einer Datenbank, die mutable state hat.
+
+#### Fazit
+Im Backend haben wir verschiedene Prinzipien der funktionalen Programmierung implementiert. Diese umfassen die Nutzung unveränderlicher Datenstrukturen, Higher-Order Functions und die Verwaltung von Zustand und Seiteneffekten durch gut definierte Bereiche. Die Anwendung von puren Funktionen war jedoch aufgrund der unvermeidbaren Seiteneffekte, die durch Datenbanktransaktionen und andere externe Abhängigkeiten verursacht werden, eingeschränkt. Trotz dieser Einschränkungen tragen unsere funktionalen Ansätze zu einem saubereren, wartbaren und weniger fehleranfälligen Code bei.
 
 ## Reflexion
 
