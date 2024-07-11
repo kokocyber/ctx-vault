@@ -98,6 +98,68 @@ Diese Sicherheitsmaßnahmen sind integraler Bestandteil unserer Datenabspeicheru
 |  |  |
 | /vault | Passwort Vault Seite |
 
+## Functional Programming
+### Backend
+#### Pure Functions
+Im Backend-Entwicklungsumfeld ist es oft schwierig, reine funktionale Programmierung und damit pure functions vollständig umzusetzen. Das liegt daran, dass viele Backend-Operationen unvermeidliche Seiteneffekte haben, wie etwa Datenbanktransaktionen, Netzwerkanfragen und das Lesen/Schreiben von Dateien. Diese Operationen ändern den Zustand des Systems oder hängen von externen Ressourcen ab, was gegen das Prinzip der puren Funktionen verstößt.
+
+#### Higher Order Functions
+Wir haben in unserem Projekt in verschiedenen Fällen dieses Prinzip angewendet. Nämlich in einem der wichtigsten Aspekten; die Authorization.
+```
+/middleware/auth.js
+```
+```
+export function withSession(handler) {
+    return async function(request) {
+        const session = await getSession()
+        if(!session) {
+            return Response.json({ "Unauthorized": "Not logged in"}, { status: 401 })
+        }
+        return handler(request, session)
+    }
+}
+```
+In diesem Beispiel geben wir eine Funktion als Parameter sowie als Rückgabe, damit wir ergänzte Authentifikation implementieren können:
+
+```
+export function withPermission(handler) {
+    return async function(request, session) {
+        const { searchParams } = new URL(request.url)
+        const userId = parseInt(searchParams.get("id"))
+
+        if(
+            (session.user.id !== userId || !await accessResource(request, session)) && 
+            session.user.role !== "Admin"
+        ) {
+            return Response.json({ "Unauthorized": "Not enough permission" }, { status: 403 })
+        }
+        return handler(request, session)
+    }
+}
+```
+Dies ergänzt die vorherige Funktion um erneut zu überprüfen, ob der Nutzer die korrekte Rolle besitzt. In der Praxis sieht es wie folgend aus:
+```
+export const GET = withSession(withPermission(async (request, session) => {...}))
+```
+
+#### Mutability
+```
+export const DELETE = withSession(withPermission(async (request, session) => {
+  try {
+    const { searchParams } = new URL(request.url)
+    const passwordId = parseInt(searchParams.get("passwordId"))
+
+    const deletedPassword = deletePassword(passwordId)
+    return Response.json({ "deleted password": deletedPassword }, { status: 200 })
+  } catch (e) {
+    return Response.json({ "error": e.message }, { status: 404 })
+  } finally {
+    await prisma.$disconnect()
+  }
+}))
+```
+Die Funktion `deletePassword(passwordId)` führt eine Datenbankoperation durch, die einen Eintrag löscht. Das ist ein klarer Fall von mutable state, da es den Zustand der Datenbank verändert. Die Funktion selbst verändert keine ihrer Eingaben direkt, aber sie interagiert mit einer Datenbank, die mutable state hat.
+
 ## Reflexion
 
 ### Taha
