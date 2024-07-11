@@ -51,7 +51,8 @@ DATABASE_URL="postgresql://postgres:testPassword@localhost:5432/vault?schema=pub
 Starte die Applikation
 
 ```sh
-npm run dev
+npm run build
+npm run start
 ```
 
 ## Endpoints
